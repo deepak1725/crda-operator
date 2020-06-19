@@ -3,5 +3,9 @@ kind: CodeReadyAnalytics
 metadata:
   name: example-codereadyanalytics
 spec:
-  # Add fields here
-  size: 3
+  api-server: 
+    image: "sharma1725/aserver"
+    size: 1
+  backbone:
+    image: "sharma1725/backbone"
+    size: 1

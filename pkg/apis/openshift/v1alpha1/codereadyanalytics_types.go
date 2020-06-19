@@ -7,18 +7,30 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+type BackboneServiceType struct {
+	// Backbone Service Specs
+	Image string `json:"image,omitempty"`
+	Size  int32  `json:"size,omitempty"`
+}
+
+type ServerServiceType struct {
+	// API Server Service Specs
+	Image string `json:"image,omitempty"`
+	Size  int32  `json:"size,omitempty"`
+}
+
 // CodeReadyAnalyticsSpec defines the desired state of CodeReadyAnalytics
 type CodeReadyAnalyticsSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
+	// Fields Required for Operator Functioning.
+	BackboneService  BackboneServiceType `json:"backbone,omitempty"`
+	APIServerService ServerServiceType   `json:"api-server,omitempty"`
 }
 
 // CodeReadyAnalyticsStatus defines the observed state of CodeReadyAnalytics
 type CodeReadyAnalyticsStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
+	// Status fields
+	BackboneService  BackboneServiceType `json:"backbone,omitempty"`
+	APIServerService ServerServiceType   `json:"api-server,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
