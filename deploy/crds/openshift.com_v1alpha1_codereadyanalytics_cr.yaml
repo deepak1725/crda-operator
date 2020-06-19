@@ -1,0 +1,7 @@
+apiVersion: openshift.com/v1alpha1
+kind: CodeReadyAnalytics
+metadata:
+  name: example-codereadyanalytics
+spec:
+  # Add fields here
+  size: 3
