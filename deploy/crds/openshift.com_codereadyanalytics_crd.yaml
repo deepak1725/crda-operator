@@ -33,22 +33,68 @@ spec:
           properties:
             api-server:
               properties:
+                containerPort:
+                  format: int32
+                  type: integer
                 image:
                   description: API Server Service Specs
+                  type: string
+                name:
                   type: string
                 size:
                   format: int32
                   type: integer
               type: object
             backbone:
-              description: Fields Required for Operator Functioning.
               properties:
+                containerPort:
+                  format: int32
+                  type: integer
                 image:
                   description: Backbone Service Specs
+                  type: string
+                name:
                   type: string
                 size:
                   format: int32
                   type: integer
+              type: object
+            config:
+              description: Fields Required for Operator Functioning.
+              properties:
+                common:
+                  description: Common Config Specs
+                  properties:
+                    authUrl:
+                      description: Common Config Specs
+                      type: string
+                    aws_access_key_id:
+                      type: string
+                    aws_secret_access_key:
+                      type: string
+                    deploymentPrefix:
+                      type: string
+                    dynamodbPrefix:
+                      type: string
+                    three_scale_account_secret:
+                      type: string
+                  type: object
+                database:
+                  properties:
+                    dbName:
+                      description: Database Config Specs
+                      type: string
+                    host:
+                      type: string
+                    initialDatabase:
+                      type: string
+                    password:
+                      type: string
+                    port:
+                      type: string
+                    username:
+                      type: string
+                  type: object
               type: object
           type: object
         status:
@@ -56,8 +102,13 @@ spec:
           properties:
             api-server:
               properties:
+                containerPort:
+                  format: int32
+                  type: integer
                 image:
                   description: API Server Service Specs
+                  type: string
+                name:
                   type: string
                 size:
                   format: int32
@@ -66,8 +117,13 @@ spec:
             backbone:
               description: Status fields
               properties:
+                containerPort:
+                  format: int32
+                  type: integer
                 image:
                   description: Backbone Service Specs
+                  type: string
+                name:
                   type: string
                 size:
                   format: int32

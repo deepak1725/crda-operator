@@ -3,9 +3,32 @@ kind: CodeReadyAnalytics
 metadata:
   name: example-codereadyanalytics
 spec:
+  config:
+    common:
+      authUrl: ""
+      deploymentPrefix: ""
+      dynamodbPrefix: ""
+      three_scale_account_secret: abc
+      aws_access_key_id: ""
+      aws_secret_access_key: ""
+    database: 
+      dbName: ""
+      host: ""
+      initialDatabase: ""
+      password: ""
+      port: 5432
+      username: ""
+
+
   api-server: 
-    image: "sharma1725/aserver"
+    image: sharma1725/aserver
     size: 1
+    containerPort: 5000
+    name: api-server
+    port: 32000
   backbone:
-    image: "sharma1725/backbone"
+    image: sharma1725/backbone
     size: 1
+    containerPort: 5000
+    name: backbone
+    port: 32000
