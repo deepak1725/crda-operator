@@ -68,15 +68,15 @@ spec:
                     authUrl:
                       description: Common Config Specs
                       type: string
-                    aws_access_key_id:
+                    awsAccessKeyId:
                       type: string
-                    aws_secret_access_key:
+                    awsSecretAccessKey:
                       type: string
                     deploymentPrefix:
                       type: string
                     dynamodbPrefix:
                       type: string
-                    three_scale_account_secret:
+                    threeScaleAccountSecret:
                       type: string
                   type: object
                 database:

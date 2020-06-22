@@ -88,6 +88,12 @@ func (r *ReconcileCodeReadyAnalytics) apiDeployment(v *openshiftv1alpha1.CodeRea
 			Key:                  "aws_secret_access_key",
 		},
 	}
+	three_scale_secret := &corev1.EnvVarSource{
+		SecretKeyRef: &corev1.SecretKeySelector{
+			LocalObjectReference: corev1.LocalObjectReference{Name: "3scale"},
+			Key:                  "three_scale_account_secret",
+		},
+	}
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -208,6 +214,14 @@ func (r *ReconcileCodeReadyAnalytics) apiDeployment(v *openshiftv1alpha1.CodeRea
 							{
 								Name:      "AWS_SQS_SECRET_ACCESS_KEY",
 								ValueFrom: aws_secret_access_key,
+							},
+							{
+								Name:      "THREESCALE_ACCOUNT_SECRET",
+								ValueFrom: three_scale_secret,
+							},
+							{
+								Name:  "STACK_ANALYSIS_REQUEST_TIMEOUT",
+								Value: "120",
 							},
 						},
 					}},

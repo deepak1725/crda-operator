@@ -8,15 +8,15 @@ spec:
       authUrl: ""
       deploymentPrefix: ""
       dynamodbPrefix: ""
-      three_scale_account_secret: abc
-      aws_access_key_id: ""
-      aws_secret_access_key: ""
+      threeScaleAccountSecret: ""
+      awsAccessKeyId: ""
+      awsSecretAccessKey: ""
     database: 
       dbName: ""
       host: ""
       initialDatabase: ""
       password: ""
-      port: 5432
+      port: ""
       username: ""
 
 

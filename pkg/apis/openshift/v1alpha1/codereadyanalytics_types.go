@@ -38,9 +38,9 @@ type CommonType struct {
 	AuthUrl                 string `json:"authUrl,omitempty"`
 	DeploymentPrefix        string `json:"deploymentPrefix,omitempty"`
 	DynamodbPrefix          string `json:"dynamodbPrefix,omitempty"`
-	ThreeScaleAccountSecret string `json:"three_scale_account_secret,omitempty"`
-	AwsAccessKeyId          string `json:"aws_access_key_id,omitempty"`
-	AwsSecretAccessKey      string `json:"aws_secret_access_key,omitempty"`
+	ThreeScaleAccountSecret string `json:"threeScaleAccountSecret,omitempty"`
+	AwsAccessKeyId          string `json:"awsAccessKeyId,omitempty"`
+	AwsSecretAccessKey      string `json:"awsSecretAccessKey,omitempty"`
 }
 
 type ConfigType struct {
