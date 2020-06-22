@@ -23,6 +23,12 @@ type ServerServiceType struct {
 	Name          string `json:"name,omitempty"`
 }
 
+type PgbouncerType struct {
+	// Pgbouncer Specs
+	Name string `json:"name,omitempty"`
+	Size int32  `json:"size,omitempty"`
+}
+
 type DatabaseType struct {
 	// Database Config Specs
 	DbName          string `json:"dbName,omitempty"`
@@ -55,6 +61,7 @@ type CodeReadyAnalyticsSpec struct {
 	Config           ConfigType          `json:"config,omitempty"`
 	BackboneService  BackboneServiceType `json:"backbone,omitempty"`
 	APIServerService ServerServiceType   `json:"api-server,omitempty"`
+	Pgbouncer        PgbouncerType       `json:"pgbouncer,omitempty"`
 }
 
 // CodeReadyAnalyticsStatus defines the observed state of CodeReadyAnalytics
@@ -62,6 +69,7 @@ type CodeReadyAnalyticsStatus struct {
 	// Status fields
 	BackboneService  BackboneServiceType `json:"backbone,omitempty"`
 	APIServerService ServerServiceType   `json:"api-server,omitempty"`
+	Pgbouncer        PgbouncerType       `json:"pgbouncer,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

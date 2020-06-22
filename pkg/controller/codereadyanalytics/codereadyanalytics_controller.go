@@ -139,6 +139,17 @@ func (r *ReconcileCodeReadyAnalytics) Reconcile(request reconcile.Request) (reco
 		return reconcile.Result{}, err
 	}
 
+	// == Pgbouncer Service  ==========
+	result, err = r.ensureDeployment(request, instance, r.bouncerDeployment(instance))
+	if result != nil {
+		return *result, err
+	}
+
+	result, err = r.ensureService(request, instance, r.pgBouncerService(instance))
+	if result != nil {
+		return *result, err
+	}
+
 	// result, err = r.handleApiServerChanges(instance)
 	// if result != nil {
 	// 	return *result, err

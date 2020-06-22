@@ -96,6 +96,15 @@ spec:
                       type: string
                   type: object
               type: object
+            pgbouncer:
+              properties:
+                name:
+                  description: Pgbouncer Specs
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
           type: object
         status:
           description: CodeReadyAnalyticsStatus defines the observed state of CodeReadyAnalytics
@@ -124,6 +133,15 @@ spec:
                   description: Backbone Service Specs
                   type: string
                 name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            pgbouncer:
+              properties:
+                name:
+                  description: Pgbouncer Specs
                   type: string
                 size:
                   format: int32

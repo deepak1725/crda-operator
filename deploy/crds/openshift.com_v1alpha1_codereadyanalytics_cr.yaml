@@ -5,21 +5,22 @@ metadata:
 spec:
   config:
     common:
-      authUrl: ""
-      deploymentPrefix: ""
-      dynamodbPrefix: ""
-      threeScaleAccountSecret: ""
-      awsAccessKeyId: ""
-      awsSecretAccessKey: ""
+      authUrl: https://youareawesome.com
+      deploymentPrefix: deepshar
+      dynamodbPrefix: deepshar-dev
+      threeScaleAccountSecret: abc
+      awsAccessKeyId: AMAIAKAIAKAIAKAI
+      awsSecretAccessKey: hoHANYouAreFuckingAwesomeLcSKc3g
     database: 
-      dbName: ""
-      host: ""
-      initialDatabase: ""
-      password: ""
-      port: ""
-      username: ""
-
-
+      dbName: coreapi
+      host:   "localhost"
+      initialDatabase: postgres
+      password: pass
+      port: "5432"
+      username: coreapi
+  pgbouncer:
+    name: bayesian-pgbouncer
+    size: 1
   api-server: 
     image: sharma1725/aserver
     size: 1
