@@ -1,0 +1,156 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: codereadyanalytics.openshift.com
+spec:
+  group: openshift.com
+  names:
+    kind: CodeReadyAnalytics
+    listKind: CodeReadyAnalyticsList
+    plural: codereadyanalytics
+    singular: codereadyanalytics
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: CodeReadyAnalytics is the Schema for the codereadyanalytics API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: CodeReadyAnalyticsSpec defines the desired state of CodeReadyAnalytics
+          properties:
+            api-server:
+              properties:
+                containerPort:
+                  format: int32
+                  type: integer
+                image:
+                  description: API Server Service Specs
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            backbone:
+              properties:
+                containerPort:
+                  format: int32
+                  type: integer
+                image:
+                  description: Backbone Service Specs
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            config:
+              description: Fields Required for Operator Functioning.
+              properties:
+                common:
+                  description: Common Config Specs
+                  properties:
+                    authUrl:
+                      description: Common Config Specs
+                      type: string
+                    awsAccessKeyId:
+                      type: string
+                    awsSecretAccessKey:
+                      type: string
+                    deploymentPrefix:
+                      type: string
+                    dynamodbPrefix:
+                      type: string
+                    threeScaleAccountSecret:
+                      type: string
+                  type: object
+                database:
+                  properties:
+                    dbName:
+                      description: Database Config Specs
+                      type: string
+                    host:
+                      type: string
+                    initialDatabase:
+                      type: string
+                    password:
+                      type: string
+                    port:
+                      type: string
+                    username:
+                      type: string
+                  type: object
+              type: object
+            pgbouncer:
+              properties:
+                name:
+                  description: Pgbouncer Specs
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+          type: object
+        status:
+          description: CodeReadyAnalyticsStatus defines the observed state of CodeReadyAnalytics
+          properties:
+            api-server:
+              properties:
+                containerPort:
+                  format: int32
+                  type: integer
+                image:
+                  description: API Server Service Specs
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            backbone:
+              description: Status fields
+              properties:
+                containerPort:
+                  format: int32
+                  type: integer
+                image:
+                  description: Backbone Service Specs
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            pgbouncer:
+              properties:
+                name:
+                  description: Pgbouncer Specs
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true

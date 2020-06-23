@@ -1,0 +1,195 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "openshift.com/v1alpha1",
+          "kind": "CodeReadyAnalytics",
+          "metadata": {
+            "name": "example-codereadyanalytics"
+          },
+          "spec": {
+            "api-server": {
+              "containerPort": 5000,
+              "image": "sharma1725/aserver",
+              "name": "api-server",
+              "port": 32000,
+              "size": 1
+            },
+            "backbone": {
+              "containerPort": 5000,
+              "image": "sharma1725/backbone",
+              "name": "backbone",
+              "port": 32000,
+              "size": 1
+            },
+            "config": {
+              "common": {
+                "authUrl": "https://youareawesome.com",
+                "awsAccessKeyId": "AMAIAKAIAKAIAKAI",
+                "awsSecretAccessKey": "hoHANYouAreFuckingAwesomeLcSKc3g",
+                "deploymentPrefix": "deepshar",
+                "dynamodbPrefix": "deepshar-dev",
+                "threeScaleAccountSecret": "abc"
+              },
+              "database": {
+                "dbName": "coreapi",
+                "host": "localhost",
+                "initialDatabase": "postgres",
+                "password": "pass",
+                "port": "5432",
+                "username": "coreapi"
+              }
+            },
+            "pgbouncer": {
+              "name": "bayesian-pgbouncer",
+              "size": 1
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+  name: crda-operator.v0.1.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: CodeReadyAnalytics is the Schema for the codereadyanalytics API
+      kind: CodeReadyAnalytics
+      name: codereadyanalytics.openshift.com
+      version: v1alpha1
+  displayName: Crda Operator
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments:
+      - name: crda-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              name: crda-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                name: crda-operator
+            spec:
+              containers:
+              - command:
+                - crda-operator
+                env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: OPERATOR_NAME
+                  value: crda-operator
+                image: docker.io/sharma1725/crda-operator
+                imagePullPolicy: Always
+                name: crda-operator
+                resources: {}
+              serviceAccountName: crda-operator
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - services/finalizers
+          - endpoints
+          - persistentvolumeclaims
+          - events
+          - configmaps
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - get
+          - create
+        - apiGroups:
+          - apps
+          resourceNames:
+          - crda-operator
+          resources:
+          - deployments/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - get
+        - apiGroups:
+          - apps
+          resources:
+          - replicasets
+          - deployments
+          verbs:
+          - get
+        - apiGroups:
+          - openshift.com
+          resources:
+          - '*'
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        serviceAccountName: crda-operator
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - ""
+  maintainers:
+  - {}
+  maturity: alpha
+  provider: {}
+  version: 0.1.0

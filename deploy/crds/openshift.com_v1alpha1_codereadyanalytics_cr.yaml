@@ -13,7 +13,7 @@ spec:
       awsSecretAccessKey: hoHANYouAreFuckingAwesomeLcSKc3g
     database: 
       dbName: coreapi
-      host:   "localhost"
+      host:     localhost
       initialDatabase: postgres
       password: pass
       port: "5432"
