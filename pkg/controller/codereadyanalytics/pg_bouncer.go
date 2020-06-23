@@ -33,7 +33,7 @@ func (r *ReconcileCodeReadyAnalytics) bouncerDeployment(v *openshiftv1alpha1.Cod
 			Key:                  "host",
 		},
 	}
-	initial_database := &corev1.EnvVarSource{
+	initialDatabase := &corev1.EnvVarSource{
 		SecretKeyRef: &corev1.SecretKeySelector{
 			LocalObjectReference: corev1.LocalObjectReference{Name: "coreapi-postgres"},
 			Key:                  "initial-database",
@@ -84,7 +84,7 @@ func (r *ReconcileCodeReadyAnalytics) bouncerDeployment(v *openshiftv1alpha1.Cod
 							},
 							{
 								Name:      "POSTGRESQL_INITIAL_DATABASE",
-								ValueFrom: initial_database,
+								ValueFrom: initialDatabase,
 							},
 							{
 								Name:      "POSTGRESQL_PASSWORD",

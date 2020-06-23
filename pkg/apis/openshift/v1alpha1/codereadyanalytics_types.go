@@ -7,30 +7,30 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// BackboneServiceType defines Backbone Service Specs
 type BackboneServiceType struct {
-	// Backbone Service Specs
 	Image         string `json:"image,omitempty"`
 	Size          int32  `json:"size,omitempty"`
 	ContainerPort int32  `json:"containerPort,omitempty"`
 	Name          string `json:"name,omitempty"`
 }
 
+// ServerServiceType defines API Server Service Specs
 type ServerServiceType struct {
-	// API Server Service Specs
 	Image         string `json:"image,omitempty"`
 	Size          int32  `json:"size,omitempty"`
 	ContainerPort int32  `json:"containerPort,omitempty"`
 	Name          string `json:"name,omitempty"`
 }
 
+// PgbouncerType defines Specs for Pgbouncer Service
 type PgbouncerType struct {
-	// Pgbouncer Specs
 	Name string `json:"name,omitempty"`
 	Size int32  `json:"size,omitempty"`
 }
 
+// DatabaseType defines Database Config Specs
 type DatabaseType struct {
-	// Database Config Specs
 	DbName          string `json:"dbName,omitempty"`
 	Host            string `json:"host,omitempty"`
 	InitialDatabase string `json:"initialDatabase,omitempty"`
@@ -39,8 +39,8 @@ type DatabaseType struct {
 	Port            string `json:"port,omitempty"`
 }
 
+// CommonType defines common Config Specs
 type CommonType struct {
-	// Common Config Specs
 	AuthUrl                 string `json:"authUrl,omitempty"`
 	DeploymentPrefix        string `json:"deploymentPrefix,omitempty"`
 	DynamodbPrefix          string `json:"dynamodbPrefix,omitempty"`
@@ -49,8 +49,8 @@ type CommonType struct {
 	AwsSecretAccessKey      string `json:"awsSecretAccessKey,omitempty"`
 }
 
+// ConfigType defines Configuration Specs
 type ConfigType struct {
-	// Common Config Specs
 	Common   CommonType   `json:"common,omitempty"`
 	Database DatabaseType `json:"database,omitempty"`
 }

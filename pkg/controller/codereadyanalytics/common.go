@@ -33,16 +33,13 @@ func (r *ReconcileCodeReadyAnalytics) ensureDeployment(request reconcile.Request
 			// Deployment failed
 			log.Error(err, "Failed to create new Deployment", "Deployment.Namespace", dep.Namespace, "Deployment.Name", dep.Name)
 			return &reconcile.Result{}, err
-		} else {
-			// Deployment was successful
-			return nil, nil
 		}
 	} else if err != nil {
 		// Error that isn't due to the deployment not existing
 		log.Error(err, "Failed to get Deployment")
 		return &reconcile.Result{}, err
 	}
-
+	// Deployment was successful
 	return nil, nil
 }
 
@@ -65,16 +62,13 @@ func (r *ReconcileCodeReadyAnalytics) ensureService(request reconcile.Request,
 			// Creation failed
 			log.Error(err, "Failed to create new Service", "Service.Namespace", s.Namespace, "Service.Name", s.Name)
 			return &reconcile.Result{}, err
-		} else {
-			// Creation was successful
-			return nil, nil
 		}
 	} else if err != nil {
 		// Error that isn't due to the service not existing
 		log.Error(err, "Failed to get Service")
 		return &reconcile.Result{}, err
 	}
-
+	// Creation was successful
 	return nil, nil
 }
 
@@ -96,16 +90,13 @@ func (r *ReconcileCodeReadyAnalytics) ensureSecret(request reconcile.Request,
 			// Creation failed
 			log.Error(err, "Failed to create new Secret", "Secret.Namespace", secret.Namespace, "Secret.Name", secret.Name)
 			return &reconcile.Result{}, err
-		} else {
-			// Creation was successful
-			return nil, nil
 		}
 	} else if err != nil {
 		// Error that isn't due to the secret not existing
 		log.Error(err, "Failed to get Secret")
 		return &reconcile.Result{}, err
 	}
-
+	// Creation was successful
 	return nil, nil
 }
 
@@ -123,15 +114,13 @@ func (r *ReconcileCodeReadyAnalytics) ensureConfigMap(request reconcile.Request,
 			// Creation failed
 			log.Error(err, "Failed to create new ConfigMap", "ConfigMap.Namespace", configMap.Namespace, "configMap.Name", configMap.Name)
 			return &reconcile.Result{}, err
-		} else {
-			// Creation was successful
-			return nil, nil
 		}
 	} else if err != nil {
 		// Error that isn't due to the secret not existing
 		log.Error(err, "Failed to get ConfigMap")
 		return &reconcile.Result{}, err
 	}
+	// Creation was successful
 	return nil, nil
 }
 

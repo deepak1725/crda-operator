@@ -52,43 +52,43 @@ func (r *ReconcileCodeReadyAnalytics) apiDeployment(v *openshiftv1alpha1.CodeRea
 	labels := labels(v, "backend")
 	size := v.Spec.APIServerService.Size
 
-	deployment_prefix := &corev1.EnvVarSource{
+	deploymentPrefix := &corev1.EnvVarSource{
 		ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 			LocalObjectReference: corev1.LocalObjectReference{Name: "bayesian-config"},
 			Key:                  "deployment-prefix",
 		},
 	}
-	db_name := &corev1.EnvVarSource{
+	dbName := &corev1.EnvVarSource{
 		SecretKeyRef: &corev1.SecretKeySelector{
 			LocalObjectReference: corev1.LocalObjectReference{Name: "coreapi-postgres"},
 			Key:                  "database",
 		},
 	}
-	db_password := &corev1.EnvVarSource{
+	dbPassword := &corev1.EnvVarSource{
 		SecretKeyRef: &corev1.SecretKeySelector{
 			LocalObjectReference: corev1.LocalObjectReference{Name: "coreapi-postgres"},
 			Key:                  "password",
 		},
 	}
-	db_username := &corev1.EnvVarSource{
+	dbUsername := &corev1.EnvVarSource{
 		SecretKeyRef: &corev1.SecretKeySelector{
 			LocalObjectReference: corev1.LocalObjectReference{Name: "coreapi-postgres"},
 			Key:                  "username",
 		},
 	}
-	aws_access_key_id := &corev1.EnvVarSource{
+	awsAccessKeyId := &corev1.EnvVarSource{
 		SecretKeyRef: &corev1.SecretKeySelector{
 			LocalObjectReference: corev1.LocalObjectReference{Name: "aws"},
 			Key:                  "aws_access_key_id",
 		},
 	}
-	aws_secret_access_key := &corev1.EnvVarSource{
+	awsSecretAccessKey := &corev1.EnvVarSource{
 		SecretKeyRef: &corev1.SecretKeySelector{
 			LocalObjectReference: corev1.LocalObjectReference{Name: "aws"},
 			Key:                  "aws_secret_access_key",
 		},
 	}
-	three_scale_secret := &corev1.EnvVarSource{
+	threeScaleSecret := &corev1.EnvVarSource{
 		SecretKeyRef: &corev1.SecretKeySelector{
 			LocalObjectReference: corev1.LocalObjectReference{Name: "3scale"},
 			Key:                  "three_scale_account_secret",
@@ -129,7 +129,7 @@ func (r *ReconcileCodeReadyAnalytics) apiDeployment(v *openshiftv1alpha1.CodeRea
 							},
 							{
 								Name:      "DEPLOYMENT_PREFIX",
-								ValueFrom: deployment_prefix,
+								ValueFrom: deploymentPrefix,
 							},
 							{
 								Name:  "WORKER_ADMINISTRATION_REGION",
@@ -197,27 +197,27 @@ func (r *ReconcileCodeReadyAnalytics) apiDeployment(v *openshiftv1alpha1.CodeRea
 							},
 							{
 								Name:      "POSTGRESQL_DATABASE",
-								ValueFrom: db_name,
+								ValueFrom: dbName,
 							},
 							{
 								Name:      "POSTGRESQL_USER",
-								ValueFrom: db_username,
+								ValueFrom: dbUsername,
 							},
 							{
 								Name:      "POSTGRESQL_PASSWORD",
-								ValueFrom: db_password,
+								ValueFrom: dbPassword,
 							},
 							{
 								Name:      "AWS_SQS_ACCESS_KEY_ID",
-								ValueFrom: aws_access_key_id,
+								ValueFrom: awsAccessKeyId,
 							},
 							{
 								Name:      "AWS_SQS_SECRET_ACCESS_KEY",
-								ValueFrom: aws_secret_access_key,
+								ValueFrom: awsSecretAccessKey,
 							},
 							{
 								Name:      "THREESCALE_ACCOUNT_SECRET",
-								ValueFrom: three_scale_secret,
+								ValueFrom: threeScaleSecret,
 							},
 							{
 								Name:  "STACK_ANALYSIS_REQUEST_TIMEOUT",
