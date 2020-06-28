@@ -44,6 +44,7 @@ metadata:
               }
             },
             "pgbouncer": {
+              "image": "quay.io/openshiftio/bayesian-coreapi-pgbouncer:latest",
               "name": "bayesian-pgbouncer",
               "size": 1
             }
@@ -67,39 +68,7 @@ spec:
     mediatype: ""
   install:
     spec:
-      deployments:
-      - name: crda-operator
-        spec:
-          replicas: 1
-          selector:
-            matchLabels:
-              name: crda-operator
-          strategy: {}
-          template:
-            metadata:
-              labels:
-                name: crda-operator
-            spec:
-              containers:
-              - command:
-                - crda-operator
-                env:
-                - name: WATCH_NAMESPACE
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.annotations['olm.targetNamespaces']
-                - name: POD_NAME
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.name
-                - name: OPERATOR_NAME
-                  value: crda-operator
-                image: docker.io/sharma1725/crda-operator
-                imagePullPolicy: Always
-                name: crda-operator
-                resources: {}
-              serviceAccountName: crda-operator
-      permissions:
+      clusterPermissions:
       - rules:
         - apiGroups:
           - ""
@@ -112,6 +81,7 @@ spec:
           - events
           - configmaps
           - secrets
+          - persistentvolumes
           verbs:
           - create
           - delete
@@ -176,6 +146,38 @@ spec:
           - update
           - watch
         serviceAccountName: crda-operator
+      deployments:
+      - name: crda-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              name: crda-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                name: crda-operator
+            spec:
+              containers:
+              - command:
+                - crda-operator
+                env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: OPERATOR_NAME
+                  value: crda-operator
+                image: docker.io/sharma1725/crda-operator
+                imagePullPolicy: Always
+                name: crda-operator
+                resources: {}
+              serviceAccountName: crda-operator
     strategy: deployment
   installModes:
   - supported: true
@@ -187,9 +189,10 @@ spec:
   - supported: true
     type: AllNamespaces
   keywords:
-  - ""
+  - crda
   maintainers:
-  - {}
+  - {Deepak Sharma <hello@finddeepak.com>}
   maturity: alpha
   provider: {}
+  replaces: crda-operator.v0.2.0
   version: 0.1.0

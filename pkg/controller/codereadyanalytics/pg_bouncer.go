@@ -57,6 +57,8 @@ func (r *ReconcileCodeReadyAnalytics) pvcDeployment(cr *openshiftv1alpha1.CodeRe
 }
 
 func (r *ReconcileCodeReadyAnalytics) pvDeployment(cr *openshiftv1alpha1.CodeReadyAnalytics) (*corev1.PersistentVolume) {
+	log.Info("Creating Deployment")
+
 	labels := map[string]string{
 		"app": "pv",
 	}
@@ -67,7 +69,6 @@ func (r *ReconcileCodeReadyAnalytics) pvDeployment(cr *openshiftv1alpha1.CodeRea
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      AppVolumeName,
-			Namespace: cr.Namespace,
 			Labels:    labels,
 		},
 		Spec: corev1.PersistentVolumeSpec{

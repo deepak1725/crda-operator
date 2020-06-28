@@ -1,11 +1,12 @@
-kind: RoleBinding
+kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: crda-operator
 subjects:
 - kind: ServiceAccount
   name: crda-operator
+  namespace: crda
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: crda-operator
   apiGroup: rbac.authorization.k8s.io

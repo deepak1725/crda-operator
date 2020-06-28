@@ -139,6 +139,7 @@ func (r *ReconcileCodeReadyAnalytics) Reconcile(request reconcile.Request) (reco
 	}
 
 	// Persistent Vol
+	log.Info("Trying to create PV")
 	result, err = r.ensurePV(request, instance, r.pvDeployment(instance))
 	if err != nil {
 		return *result, err

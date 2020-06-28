@@ -24,10 +24,11 @@ This will deploy all the custom resources defined in Specified Kind.
 ## Production Installation via [OLM](https://sdk.operatorframework.io/docs/olm-integration/user-guide/) :
 
 * Install OLM on Server `operator-sdk olm install`
+* Generate CSV `operator-sdk generate csv --csv-version 0.1.0`
 * Install Operator `operator-sdk run packagemanifests --operator-version 0.1.0 --olm`
 * Create Role `kubectl apply -f deploy/role.yaml`
 * Create Service Account `kubectl apply -f deploy/service_account.yaml`
-* Create Role Binding `kubectl apply -f deply/service_binding.yaml`  
+* Create Role Binding `kubectl apply -f deploy/role_binding.yaml`  
 * Deploy CR: `kubectl apply -f deploy/crds/openshift.com_v1alpha1_codereadyanalytics_cr.yaml`
 
 

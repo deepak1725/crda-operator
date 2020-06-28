@@ -32,12 +32,12 @@ spec:
           description: CodeReadyAnalyticsSpec defines the desired state of CodeReadyAnalytics
           properties:
             api-server:
+              description: ServerServiceType defines API Server Service Specs
               properties:
                 containerPort:
                   format: int32
                   type: integer
                 image:
-                  description: API Server Service Specs
                   type: string
                 name:
                   type: string
@@ -46,12 +46,12 @@ spec:
                   type: integer
               type: object
             backbone:
+              description: BackboneServiceType defines Backbone Service Specs
               properties:
                 containerPort:
                   format: int32
                   type: integer
                 image:
-                  description: Backbone Service Specs
                   type: string
                 name:
                   type: string
@@ -63,10 +63,9 @@ spec:
               description: Fields Required for Operator Functioning.
               properties:
                 common:
-                  description: Common Config Specs
+                  description: CommonType defines common Config Specs
                   properties:
                     authUrl:
-                      description: Common Config Specs
                       type: string
                     awsAccessKeyId:
                       type: string
@@ -80,9 +79,9 @@ spec:
                       type: string
                   type: object
                 database:
+                  description: DatabaseType defines Database Config Specs
                   properties:
                     dbName:
-                      description: Database Config Specs
                       type: string
                     host:
                       type: string
@@ -97,9 +96,11 @@ spec:
                   type: object
               type: object
             pgbouncer:
+              description: PgbouncerType defines Specs for Pgbouncer Service
               properties:
+                image:
+                  type: string
                 name:
-                  description: Pgbouncer Specs
                   type: string
                 size:
                   format: int32
@@ -110,12 +111,12 @@ spec:
           description: CodeReadyAnalyticsStatus defines the observed state of CodeReadyAnalytics
           properties:
             api-server:
+              description: ServerServiceType defines API Server Service Specs
               properties:
                 containerPort:
                   format: int32
                   type: integer
                 image:
-                  description: API Server Service Specs
                   type: string
                 name:
                   type: string
@@ -130,7 +131,6 @@ spec:
                   format: int32
                   type: integer
                 image:
-                  description: Backbone Service Specs
                   type: string
                 name:
                   type: string
@@ -139,9 +139,11 @@ spec:
                   type: integer
               type: object
             pgbouncer:
+              description: PgbouncerType defines Specs for Pgbouncer Service
               properties:
+                image:
+                  type: string
                 name:
-                  description: Pgbouncer Specs
                   type: string
                 size:
                   format: int32
