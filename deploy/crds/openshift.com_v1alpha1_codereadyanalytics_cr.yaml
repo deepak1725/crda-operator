@@ -19,6 +19,7 @@ spec:
       port: "5432"
       username: coreapi
   pgbouncer:
+    image: quay.io/openshiftio/bayesian-coreapi-pgbouncer:latest
     name: bayesian-pgbouncer
     size: 1
   api-server: 

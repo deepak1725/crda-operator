@@ -215,3 +215,110 @@ func (r *ReconcileCodeReadyAnalytics) bayesianConfigMap(instance *openshiftv1alp
 		},
 	}
 }
+
+// CreateVolume generates a PersistentVolume and Claim.
+func (r *ReconcileCodeReadyAnalytics) ensurePV(request reconcile.Request, 
+	instance *openshiftv1alpha1.CodeReadyAnalytics,
+	dep *corev1.PersistentVolume,
+	) (*reconcile.Result, error) {
+
+	foundVolume := &corev1.PersistentVolume{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      dep.Name,
+		Namespace: instance.Namespace,
+	}, foundVolume)
+	
+	log.Info("Instance Name")
+	log.Info(instance.Name)
+
+	log.Info("Getting Persistent Volume")
+	if err != nil && errors.IsNotFound(err) {
+		log.Info("Vol not found")
+		pvDep := r.pvDeployment(instance)
+
+		// Create the deployment
+		log.Info("Creating a new PV", "PV.Namespace", pvDep.Namespace, "PV.Name", pvDep.Name)
+		err = r.client.Create(context.TODO(), pvDep)
+
+		if err != nil {
+			// Deployment failed
+			log.Error(err, "Failed to create new PV", "PV.Namespace", pvDep.Namespace, "PV.Name", pvDep.Name)
+			return &reconcile.Result{}, err
+		}
+	} else if err != nil {
+		// Error that isn't due to the deployment not existing
+		log.Error(err, "Failed to get Persistent Vol")
+		return &reconcile.Result{}, err
+	}
+	// VOLUME was successful
+	return nil, nil
+}
+
+func (r *ReconcileCodeReadyAnalytics) ensurePVC(request reconcile.Request,
+	instance *openshiftv1alpha1.CodeReadyAnalytics,
+	pvcDep *corev1.PersistentVolumeClaim,
+) (*reconcile.Result, error) {
+	// PVC
+	foundPVC := &corev1.PersistentVolumeClaim{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      pvcDep.Name,
+		Namespace: instance.Namespace,
+	}, foundPVC)
+
+	if err != nil && errors.IsNotFound(err) {
+		// Create the PVC
+		log.Info("Creating a new PVC", "PVC.Namespace", pvcDep.Namespace, "PVC.Name", pvcDep.Name)
+		err = r.client.Create(context.TODO(), pvcDep)
+
+		if err != nil {
+			// PVC failed
+			log.Error(err, "Failed to create new PVC", "PVC.Namespace", pvcDep.Namespace, "PVC.Name", pvcDep.Name)
+			return &reconcile.Result{}, err
+		}
+	} else if err != nil {
+		// Error that isn't due to the PVC not existing
+		log.Error(err, "Failed to get Deployment")
+		return &reconcile.Result{}, err
+	}
+	
+	log.Info("Successfull Everything")
+	return nil, nil
+}
+
+
+
+
+
+func (r *ReconcileCodeReadyAnalytics) ensureBouncerDeployment(request reconcile.Request,
+	instance *openshiftv1alpha1.CodeReadyAnalytics,
+	dep *appsv1.StatefulSet,
+) (*reconcile.Result, error) {
+
+	// See if deployment already exists and create if it doesn't
+	found := &appsv1.StatefulSet{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      dep.Name,
+		Namespace: instance.Namespace,
+	}, found)
+	if err != nil && errors.IsNotFound(err) {
+
+		// Create the deployment
+		log.Info("Creating a new Deployment", "Deployment.Namespace", dep.Namespace, "Deployment.Name", dep.Name)
+		err = r.client.Create(context.TODO(), dep)
+
+		if err != nil {
+			// Deployment failed
+			log.Error(err, "Failed to create new Deployment", "Deployment.Namespace", dep.Namespace, "Deployment.Name", dep.Name)
+			return &reconcile.Result{}, err
+		}
+		if err := r.client.Update(context.TODO(), instance); err != nil {
+			return &reconcile.Result{}, nil
+		}
+	} else if err != nil {
+		// Error that isn't due to the deployment not existing
+		log.Error(err, "Failed to get Deployment")
+		return &reconcile.Result{}, err
+	}
+	// Deployment was successful
+	return nil, nil
+}

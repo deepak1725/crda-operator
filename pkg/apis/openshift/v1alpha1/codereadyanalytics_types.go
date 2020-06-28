@@ -27,6 +27,7 @@ type ServerServiceType struct {
 type PgbouncerType struct {
 	Name string `json:"name,omitempty"`
 	Size int32  `json:"size,omitempty"`
+	Image string `json:"image,omitempty"`
 }
 
 // DatabaseType defines Database Config Specs

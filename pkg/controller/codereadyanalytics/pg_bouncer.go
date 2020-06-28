@@ -7,19 +7,90 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	// "k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/apimachinery/pkg/api/resource"
+	"fmt"
 )
 
 func bouncerDeploymentName(v *openshiftv1alpha1.CodeReadyAnalytics) string {
 	return v.Spec.Pgbouncer.Name
 }
 
-func (r *ReconcileCodeReadyAnalytics) bouncerDeployment(v *openshiftv1alpha1.CodeReadyAnalytics) *appsv1.Deployment {
+const (
+	DiskSize            = 1 * 1000 * 1000  //1 MB
+	AppVolumeName       = "app"
+	AppVolumeMountPath  = "/usr/share/hello"
+	HostProvisionerPath = "/tmp/hostpath-provisioner"
+	ImagePullPolicy     = corev1.PullAlways
+)	
+
+var (
+	storageClassName              = "standard"
+	diskSize                      = *resource.NewQuantity(DiskSize, resource.DecimalSI)
+	terminationGracePeriodSeconds = int64(10)
+	accessMode                    = []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce}
+	resourceList                  = corev1.ResourceList{corev1.ResourceStorage: diskSize}
+)
+
+
+
+func (r *ReconcileCodeReadyAnalytics) pvcDeployment(cr *openshiftv1alpha1.CodeReadyAnalytics) (*corev1.PersistentVolumeClaim) {
 	labels := map[string]string{
-		"app": v.Name,
+		"app": cr.Name,
 	}
-	size := v.Spec.Pgbouncer.Size
+	pvc := &corev1.PersistentVolumeClaim{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "PersistentVolumeClaim",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      AppVolumeName,
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Spec: corev1.PersistentVolumeClaimSpec{
+			AccessModes: accessMode,
+			VolumeName:  AppVolumeName,
+			Resources:   corev1.ResourceRequirements{Requests: resourceList},
+		},
+	}
+	addOwnerRefToObject(pvc, asOwner(cr))
+	return pvc
+}
+
+func (r *ReconcileCodeReadyAnalytics) pvDeployment(cr *openshiftv1alpha1.CodeReadyAnalytics) (*corev1.PersistentVolume) {
+	labels := map[string]string{
+		"app": "pv",
+	}
+	dep := &corev1.PersistentVolume{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "PersistentVolume",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      AppVolumeName,
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Spec: corev1.PersistentVolumeSpec{
+			StorageClassName: storageClassName,
+			AccessModes:      accessMode,
+			Capacity:         resourceList,
+			PersistentVolumeSource: corev1.PersistentVolumeSource{
+				HostPath: &corev1.HostPathVolumeSource{
+					Path: fmt.Sprintf("%s/%s", HostProvisionerPath, cr.ObjectMeta.Name),
+				},
+			},
+		},
+	}
+	addOwnerRefToObject(dep, asOwner(cr))
+	return dep
+}
+
+func (r *ReconcileCodeReadyAnalytics) bouncerDeployment(cr *openshiftv1alpha1.CodeReadyAnalytics) *appsv1.StatefulSet {
+	log.Info("Creating a new Statefulset")
+	labels := map[string]string{
+		"app": bouncerDeploymentName(cr),
+	}
+	size := cr.Spec.Pgbouncer.Size
 
 	database := &corev1.EnvVarSource{
 		SecretKeyRef: &corev1.SecretKeySelector{
@@ -57,14 +128,18 @@ func (r *ReconcileCodeReadyAnalytics) bouncerDeployment(v *openshiftv1alpha1.Cod
 			Key:                  "port",
 		},
 	}
-
-	dep := &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      bouncerDeploymentName(v),
-			Namespace: v.Namespace,
+	statefulset := &appsv1.StatefulSet{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "StatefulSet",
+			APIVersion: "apps/v1",
 		},
-		Spec: appsv1.DeploymentSpec{
-			Replicas: &size,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      bouncerDeploymentName(cr),
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Spec: appsv1.StatefulSetSpec{
+			Replicas:   &size,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
@@ -73,67 +148,105 @@ func (r *ReconcileCodeReadyAnalytics) bouncerDeployment(v *openshiftv1alpha1.Cod
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{{
-						Image:           "quay.io/openshiftio/bayesian-coreapi-pgbouncer:latest",
-						ImagePullPolicy: corev1.PullAlways,
-						Name:            apiDeploymentName(v),
-						Env: []corev1.EnvVar{
-							{
-								Name:      "POSTGRESQL_DATABASE",
-								ValueFrom: database,
+					TerminationGracePeriodSeconds: &terminationGracePeriodSeconds,
+					Containers: []corev1.Container{
+						corev1.Container{
+							Name:            cr.Spec.Pgbouncer.Name,
+							Image:           cr.Spec.Pgbouncer.Image,
+							ImagePullPolicy: ImagePullPolicy,
+							VolumeMounts: []corev1.VolumeMount{
+								corev1.VolumeMount{
+									Name:      AppVolumeName,
+									MountPath: AppVolumeMountPath,
 							},
-							{
-								Name:      "POSTGRESQL_INITIAL_DATABASE",
-								ValueFrom: initialDatabase,
 							},
-							{
-								Name:      "POSTGRESQL_PASSWORD",
-								ValueFrom: password,
-							},
-							{
-								Name:      "POSTGRESQL_USER",
-								ValueFrom: username,
-							},
-							{
-								Name:      "POSTGRES_SERVICE_HOST",
-								ValueFrom: host,
-							},
-							{
-								Name:      "POSTGRES_SERVICE_PORT",
-								ValueFrom: port,
+							Env: []corev1.EnvVar{
+								{
+									Name:      "POSTGRESQL_DATABASE",
+									ValueFrom: database,
+								},
+								{
+									Name:      "POSTGRESQL_INITIAL_DATABASE",
+									ValueFrom: initialDatabase,
+								},
+								{
+									Name:      "POSTGRESQL_PASSWORD",
+									ValueFrom: password,
+								},
+								{
+									Name:      "POSTGRESQL_USER",
+									ValueFrom: username,
+								},
+								{
+									Name:      "POSTGRES_SERVICE_HOST",
+									ValueFrom: host,
+								},
+								{
+									Name:      "POSTGRES_SERVICE_PORT",
+									ValueFrom: port,
+								},
 							},
 						},
-					}},
+					},
+					Volumes: []corev1.Volume{
+						corev1.Volume{
+							Name: AppVolumeName,
+							VolumeSource: corev1.VolumeSource{
+								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+									ClaimName: AppVolumeName,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 	}
-
-	controllerutil.SetControllerReference(v, dep, r.scheme)
-	return dep
+	addOwnerRefToObject(statefulset, asOwner(cr))
+	return statefulset
+}
+// addOwnerRefToObject appends the desired OwnerReference to the object
+func addOwnerRefToObject(obj metav1.Object, ownerRef metav1.OwnerReference) {
+	obj.SetOwnerReferences(append(obj.GetOwnerReferences(), ownerRef))
 }
 
-func (r *ReconcileCodeReadyAnalytics) pgBouncerService(v *openshiftv1alpha1.CodeReadyAnalytics) *corev1.Service {
-	labels := map[string]string{
-		"app": v.Name,
+// asOwner returns an OwnerReference set as the stateful CR
+func asOwner(hs *openshiftv1alpha1.CodeReadyAnalytics) metav1.OwnerReference {
+	trueVar := true
+	return metav1.OwnerReference{
+		APIVersion: hs.APIVersion,
+		Kind:       hs.Kind,
+		Name:       hs.Name,
+		UID:        hs.UID,
+		Controller: &trueVar,
 	}
+}
 
-	s := &corev1.Service{
+func (r *ReconcileCodeReadyAnalytics) bouncerService(cr *openshiftv1alpha1.CodeReadyAnalytics) (*corev1.Service) {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+	service := &corev1.Service{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "Service",
+		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      bouncerDeploymentName(v),
-			Namespace: v.Namespace,
+			Name:      cr.Spec.Pgbouncer.Name,
+			Namespace: cr.Namespace,
+			Labels:    labels,
 		},
 		Spec: corev1.ServiceSpec{
-			Selector: labels,
+			Type: corev1.ServiceTypeNodePort,
+			Selector:  labels,
 			Ports: []corev1.ServicePort{{
 				Protocol:   corev1.ProtocolTCP,
 				Port:       5432,
 				TargetPort: intstr.FromInt(5432),
+				NodePort:   31500,
 			}},
-			Type: corev1.ServiceTypeNodePort,
 		},
 	}
-
-	controllerutil.SetControllerReference(v, s, r.scheme)
-	return s
+	addOwnerRefToObject(service, asOwner(cr))
+	return service
 }

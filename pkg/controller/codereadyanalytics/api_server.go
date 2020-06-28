@@ -97,7 +97,7 @@ func (r *ReconcileCodeReadyAnalytics) apiDeployment(v *openshiftv1alpha1.CodeRea
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      apiDeploymentName(v) + "-deploy",
+			Name:      apiDeploymentName(v),
 			Namespace: v.Namespace,
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -239,7 +239,7 @@ func (r *ReconcileCodeReadyAnalytics) apiService(v *openshiftv1alpha1.CodeReadyA
 
 	s := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      apiDeploymentName(v) + "-service",
+			Name:      apiDeploymentName(v),
 			Namespace: v.Namespace,
 		},
 		Spec: corev1.ServiceSpec{
