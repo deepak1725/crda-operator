@@ -2,6 +2,7 @@ apiVersion: openshift.com/v1alpha1
 kind: CodeReadyAnalytics
 metadata:
   name: example-codereadyanalytics
+  namespace: crda
 spec:
   config:
     common:

@@ -225,7 +225,6 @@ func (r *ReconcileCodeReadyAnalytics) ensurePV(request reconcile.Request,
 	foundVolume := &corev1.PersistentVolume{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{
 		Name:      dep.Name,
-		Namespace: instance.Namespace,
 	}, foundVolume)
 	
 	log.Info("Instance Name")
