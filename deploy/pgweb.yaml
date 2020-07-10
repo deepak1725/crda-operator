@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: bayesian-pgweb
+  name: bayesian-pgweb
+  namespace: crda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: bayesian-pgweb
+  template:
+    metadata:
+      labels:
+        service: bayesian-pgweb
+    spec:
+      containers:
+      - env:
+        image: sosedoff/pgweb
+        name: bayesian-pgweb
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8081
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 8081
+          protocol: TCP
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: bayesian-pgweb
+  name: bayesian-pgweb
+spec:
+  ports:
+  - name: "8081"
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+  type: LoadBalancer
+  selector:
+    service: bayesian-pgweb

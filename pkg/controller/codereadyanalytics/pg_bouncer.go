@@ -16,9 +16,9 @@ func bouncerDeploymentName(v *openshiftv1alpha1.CodeReadyAnalytics) string {
 }
 
 const (
-	DiskSize            = 1 * 1000 * 1000  //1 MB
-	AppVolumeName       = "app"
-	AppVolumeMountPath  = "/usr/share/hello"
+	DiskSize            = 1 * 1000 * 1000 * 10  //10 MB
+	AppVolumeName       = "pgdata"
+	AppVolumeMountPath  = "/pgdata"
 	HostProvisionerPath = "/tmp/hostpath-provisioner"
 	ImagePullPolicy     = corev1.PullAlways
 )	
@@ -88,9 +88,7 @@ func (r *ReconcileCodeReadyAnalytics) pvDeployment(cr *openshiftv1alpha1.CodeRea
 
 func (r *ReconcileCodeReadyAnalytics) bouncerDeployment(cr *openshiftv1alpha1.CodeReadyAnalytics) *appsv1.StatefulSet {
 	log.Info("Creating a new Statefulset")
-	labels := map[string]string{
-		"app": bouncerDeploymentName(cr),
-	}
+	labels := labels(cr, "database")
 	size := cr.Spec.Pgbouncer.Size
 
 	database := &corev1.EnvVarSource{
@@ -161,21 +159,45 @@ func (r *ReconcileCodeReadyAnalytics) bouncerDeployment(cr *openshiftv1alpha1.Co
 									MountPath: AppVolumeMountPath,
 							},
 							},
+							LivenessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{"health-check-probe.sh"},
+									},
+								},
+								InitialDelaySeconds: 10,
+								PeriodSeconds:       60,
+								TimeoutSeconds: 5,
+							},
+							ReadinessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{"health-check-probe.sh"},
+									},
+								},
+								InitialDelaySeconds: 10,
+								PeriodSeconds:       60,
+								TimeoutSeconds: 5,
+							},
 							Env: []corev1.EnvVar{
 								{
-									Name:      "POSTGRESQL_DATABASE",
+									Name:      "POSTGRES_DB",
 									ValueFrom: database,
+								},
+								{
+									Name:      "PGDATA",
+									Value: "/var/lib/postgresql/data/pgdata",
 								},
 								{
 									Name:      "POSTGRESQL_INITIAL_DATABASE",
 									ValueFrom: initialDatabase,
 								},
 								{
-									Name:      "POSTGRESQL_PASSWORD",
+									Name:      "POSTGRES_PASSWORD",
 									ValueFrom: password,
 								},
 								{
-									Name:      "POSTGRESQL_USER",
+									Name:      "POSTGRES_USER",
 									ValueFrom: username,
 								},
 								{
@@ -186,6 +208,7 @@ func (r *ReconcileCodeReadyAnalytics) bouncerDeployment(cr *openshiftv1alpha1.Co
 									Name:      "POSTGRES_SERVICE_PORT",
 									ValueFrom: port,
 								},
+								
 							},
 						},
 					},
@@ -224,9 +247,7 @@ func asOwner(hs *openshiftv1alpha1.CodeReadyAnalytics) metav1.OwnerReference {
 }
 
 func (r *ReconcileCodeReadyAnalytics) bouncerService(cr *openshiftv1alpha1.CodeReadyAnalytics) (*corev1.Service) {
-	labels := map[string]string{
-		"app": cr.Name,
-	}
+	labels := labels(cr, "database")
 	service := &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
@@ -238,7 +259,7 @@ func (r *ReconcileCodeReadyAnalytics) bouncerService(cr *openshiftv1alpha1.CodeR
 			Labels:    labels,
 		},
 		Spec: corev1.ServiceSpec{
-			Type: corev1.ServiceTypeNodePort,
+			Type: corev1.ServiceTypeLoadBalancer,
 			Selector:  labels,
 			Ports: []corev1.ServicePort{{
 				Protocol:   corev1.ProtocolTCP,

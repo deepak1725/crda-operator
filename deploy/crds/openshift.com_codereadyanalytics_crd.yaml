@@ -69,11 +69,17 @@ spec:
                       type: string
                     awsAccessKeyId:
                       type: string
+                    awsDefaultRegion:
+                      type: string
                     awsSecretAccessKey:
                       type: string
                     deploymentPrefix:
                       type: string
                     dynamodbPrefix:
+                      type: string
+                    githubToken:
+                      type: string
+                    librariesIoToken:
                       type: string
                     threeScaleAccountSecret:
                       type: string
@@ -95,6 +101,39 @@ spec:
                       type: string
                   type: object
               type: object
+            gremlin:
+              description: GremlinType defines Specs for Gremlin Service
+              properties:
+                dynamoDbEndpoint:
+                  type: string
+                image:
+                  type: string
+                name:
+                  type: string
+                resources:
+                  description: ResourceType defines Resource Types of Gremlin
+                  properties:
+                    limits:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                    requests:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                  type: object
+                size:
+                  format: int32
+                  type: integer
+              type: object
             pgbouncer:
               description: PgbouncerType defines Specs for Pgbouncer Service
               properties:
@@ -102,6 +141,37 @@ spec:
                   type: string
                 name:
                   type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            worker:
+              description: WorkerType defines Worker Types
+              properties:
+                image:
+                  type: string
+                name:
+                  type: string
+                resources:
+                  description: ResourceType defines Resource Types of Gremlin
+                  properties:
+                    limits:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                    requests:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                  type: object
                 size:
                   format: int32
                   type: integer
@@ -134,6 +204,39 @@ spec:
                   type: string
                 name:
                   type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            gremlin:
+              description: GremlinType defines Specs for Gremlin Service
+              properties:
+                dynamoDbEndpoint:
+                  type: string
+                image:
+                  type: string
+                name:
+                  type: string
+                resources:
+                  description: ResourceType defines Resource Types of Gremlin
+                  properties:
+                    limits:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                    requests:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                  type: object
                 size:
                   format: int32
                   type: integer

@@ -30,6 +30,15 @@ type PgbouncerType struct {
 	Image string `json:"image,omitempty"`
 }
 
+// GremlinType defines Specs for Gremlin Service
+type GremlinType struct {
+	Name string `json:"name,omitempty"`
+	Size int32  `json:"size,omitempty"`
+	Image string `json:"image,omitempty"`
+	DynamoDbEndpoint string `json:"dynamoDbEndpoint,omitempty"`
+	Resources ResourceType `json:"resources,omitempty"`
+}
+
 // DatabaseType defines Database Config Specs
 type DatabaseType struct {
 	DbName          string `json:"dbName,omitempty"`
@@ -48,12 +57,35 @@ type CommonType struct {
 	ThreeScaleAccountSecret string `json:"threeScaleAccountSecret,omitempty"`
 	AwsAccessKeyId          string `json:"awsAccessKeyId,omitempty"`
 	AwsSecretAccessKey      string `json:"awsSecretAccessKey,omitempty"`
+	AwsDefaultRegion      	string `json:"awsDefaultRegion,omitempty"`
+	GithubToken      		string `json:"githubToken,omitempty"`
+	LibrariesIoToken      	string `json:"librariesIoToken,omitempty"`
 }
 
 // ConfigType defines Configuration Specs
 type ConfigType struct {
 	Common   CommonType   `json:"common,omitempty"`
 	Database DatabaseType `json:"database,omitempty"`
+}
+
+// LimitType defines Resource Types of Gremlin
+type LimitType struct {
+	Memory   string   		`json:"memory,omitempty"`
+	CPU 	 string 		`json:"cpu,omitempty"`
+}
+
+// ResourceType defines Resource Types of Gremlin
+type ResourceType struct {
+	Requests   LimitType	    `json:"requests,omitempty"`
+	Limits 	   LimitType 		`json:"limits,omitempty"`
+}
+
+// WorkerType defines Worker Types
+type WorkerType struct {
+	Name   		string	     `json:"name,omitempty"`
+	Image 	   	string 		 `json:"image,omitempty"`
+	Size        int32  		 `json:"size,omitempty"`
+	Resources	ResourceType `json:"resources,omitempty"`
 }
 
 // CodeReadyAnalyticsSpec defines the desired state of CodeReadyAnalytics
@@ -63,6 +95,8 @@ type CodeReadyAnalyticsSpec struct {
 	BackboneService  BackboneServiceType `json:"backbone,omitempty"`
 	APIServerService ServerServiceType   `json:"api-server,omitempty"`
 	Pgbouncer        PgbouncerType       `json:"pgbouncer,omitempty"`
+	Gremlin          GremlinType       	`json:"gremlin,omitempty"`
+	Worker           WorkerType       	`json:"worker,omitempty"`
 }
 
 // CodeReadyAnalyticsStatus defines the observed state of CodeReadyAnalytics
@@ -71,6 +105,7 @@ type CodeReadyAnalyticsStatus struct {
 	BackboneService  BackboneServiceType `json:"backbone,omitempty"`
 	APIServerService ServerServiceType   `json:"api-server,omitempty"`
 	Pgbouncer        PgbouncerType       `json:"pgbouncer,omitempty"`
+	Gremlin          GremlinType       	`json:"gremlin,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

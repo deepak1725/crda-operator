@@ -156,6 +156,28 @@ func (r *ReconcileCodeReadyAnalytics) postgresSecret(cr *openshiftv1alpha1.CodeR
 	return secret
 }
 
+func (r *ReconcileCodeReadyAnalytics) workerSecret(cr *openshiftv1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "worker",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: "Opaque",
+		StringData: map[string]string{
+			"github-token":         cr.Spec.Config.Common.GithubToken,
+			"libraries-io-token":   cr.Spec.Config.Common.LibrariesIoToken,
+			"sentry_dsn":            "",
+		},
+	}
+	return secret
+}
+
+
 func (r *ReconcileCodeReadyAnalytics) awsSecret(cr *openshiftv1alpha1.CodeReadyAnalytics) *corev1.Secret {
 	labels := map[string]string{
 		"app": cr.Name,
@@ -169,12 +191,18 @@ func (r *ReconcileCodeReadyAnalytics) awsSecret(cr *openshiftv1alpha1.CodeReadyA
 		},
 		Type: corev1.SecretTypeOpaque,
 		Data: map[string][]byte{
-			"aws_access_key_id":     []byte(cr.Spec.Config.Common.AwsAccessKeyId),
-			"aws_secret_access_key": []byte(cr.Spec.Config.Common.AwsSecretAccessKey),
+			"aws_access_key_id":     	[]byte(cr.Spec.Config.Common.AwsAccessKeyId),
+			"s3-access-key-id":     	[]byte(cr.Spec.Config.Common.AwsAccessKeyId),
+			"aws_secret_access_key": 	[]byte(cr.Spec.Config.Common.AwsSecretAccessKey),
+			"s3-secret-access-key": 	[]byte(cr.Spec.Config.Common.AwsSecretAccessKey),
+			"sync-s3": 					[]byte("1"),
+			"aws_region": 				[]byte(cr.Spec.Config.Common.AwsSecretAccessKey),
+			"s3-bucket-for-analyses": 	[]byte("deepshar-hello"),
 		},
 	}
 	return secret
 }
+
 
 func (r *ReconcileCodeReadyAnalytics) threeScaleSecret(cr *openshiftv1alpha1.CodeReadyAnalytics) *corev1.Secret {
 	labels := map[string]string{
@@ -191,8 +219,25 @@ func (r *ReconcileCodeReadyAnalytics) threeScaleSecret(cr *openshiftv1alpha1.Cod
 		Data: map[string][]byte{
 			"three_scale_account_secret": []byte(cr.Spec.Config.Common.ThreeScaleAccountSecret),
 		},
+	}
+	return secret
+}
+
+func (r *ReconcileCodeReadyAnalytics) geminiSecret(cr *openshiftv1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "gemini-server",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: corev1.SecretTypeOpaque,
 		StringData: map[string]string{
-			"b": `test`,
+			"gemini-sa-client-id": `test`,
+			"gemini-sa-client-secret": `secret`,
 		},
 	}
 	return secret
@@ -212,6 +257,8 @@ func (r *ReconcileCodeReadyAnalytics) bayesianConfigMap(instance *openshiftv1alp
 			"dynamodb-prefix":   instance.Spec.Config.Common.DynamodbPrefix,
 			"auth-url":          instance.Spec.Config.Common.AuthUrl,
 			"deployment-prefix": instance.Spec.Config.Common.DeploymentPrefix,
+			"notification-url": "",
+			"s3-bucket-for-analyses": "deepshar-bayesian-core-package-data",
 		},
 	}
 }

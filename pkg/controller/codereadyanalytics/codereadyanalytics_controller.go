@@ -101,22 +101,79 @@ func (r *ReconcileCodeReadyAnalytics) Reconcile(request reconcile.Request) (reco
 	var result *reconcile.Result
 
 	// Secrets and Config Map Checks
+	
+	//POSTGRES Secret
 	result, err = r.ensureSecret(request, instance, r.postgresSecret(instance))
 	if result != nil {
 		return *result, err
 	}
-	// AWS
+	// AWS Secret
 	result, err = r.ensureSecret(request, instance, r.awsSecret(instance))
 	if result != nil {
 		return *result, err
 	}
-	// 3Scale
+	// 3Scale Secret
 	result, err = r.ensureSecret(request, instance, r.threeScaleSecret(instance))
+	if result != nil {
+		return *result, err
+	}
+	// Worker Secret
+	result, err = r.ensureSecret(request, instance, r.workerSecret(instance))
+	if result != nil {
+		return *result, err
+	}
+	// Gemini Secret
+	result, err = r.ensureSecret(request, instance, r.geminiSecret(instance))
 	if result != nil {
 		return *result, err
 	}
 	// Config Maps
 	result, err = r.ensureConfigMap(request, instance, r.bayesianConfigMap(instance))
+	if result != nil {
+		return *result, err
+	}
+
+	// == GREMLIN  ==========
+	result, err = r.ensureDeployment(request, instance, r.gremlinDeployment(instance))
+	if result != nil {
+		return *result, err
+	}
+
+	result, err = r.ensureService(request, instance, r.gremlinService(instance))
+	if result != nil {
+		return *result, err
+	}
+
+
+
+
+	// Persistent Vol
+	log.Info("Trying to create PV")
+	result, err = r.ensurePV(request, instance, r.pvDeployment(instance))
+	if err != nil {
+		return *result, err
+	}
+	// Persistent Vol Claim
+	result, err = r.ensurePVC(request, instance, r.pvcDeployment(instance))
+	if err != nil {
+		return *result, err
+	}
+
+
+	// PgBouncer
+	result, err = r.ensureBouncerDeployment(request, instance, r.bouncerDeployment(instance))
+	if result != nil {
+		return *result, err
+	}
+
+	result, err = r.ensureService(request, instance, r.bouncerService(instance))
+	if result != nil {
+		return *result, err
+	}
+
+
+	//Worker
+	result, err = r.ensureDeployment(request, instance, r.workerDeployment(instance))
 	if result != nil {
 		return *result, err
 	}
@@ -136,28 +193,6 @@ func (r *ReconcileCodeReadyAnalytics) Reconcile(request reconcile.Request) (reco
 	if err != nil {
 		// Requeue the request if the status could not be updated
 		return reconcile.Result{}, err
-	}
-
-	// Persistent Vol
-	log.Info("Trying to create PV")
-	result, err = r.ensurePV(request, instance, r.pvDeployment(instance))
-	if err != nil {
-		return *result, err
-	}
-	// Persistent Vol Claim
-	result, err = r.ensurePVC(request, instance, r.pvcDeployment(instance))
-	if err != nil {
-		return *result, err
-	}
-
-	result, err = r.ensureBouncerDeployment(request, instance, r.bouncerDeployment(instance))
-	if result != nil {
-		return *result, err
-	}
-
-	result, err = r.ensureService(request, instance, r.bouncerService(instance))
-	if result != nil {
-		return *result, err
 	}
 
 	// result, err = r.handleApiServerChanges(instance)
