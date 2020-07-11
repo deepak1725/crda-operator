@@ -16,8 +16,10 @@ func gremlinDeploymentName(v *openshiftv1alpha1.CodeReadyAnalytics) string {
 }
 
 func (r *ReconcileCodeReadyAnalytics) gremlinDeployment(v *openshiftv1alpha1.CodeReadyAnalytics) *appsv1.Deployment {
-	labels := labels(v, "gremlin")
-	size := v.Spec.APIServerService.Size
+	labels := map[string]string{
+		"service": v.Spec.Gremlin.Name,
+	}
+	size := v.Spec.Gremlin.Size
 
 	dynamoPrefix := &corev1.EnvVarSource{
 		ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
@@ -64,9 +66,6 @@ func (r *ReconcileCodeReadyAnalytics) gremlinDeployment(v *openshiftv1alpha1.Cod
 						Image:           v.Spec.Gremlin.Image,
 						ImagePullPolicy: corev1.PullAlways,
 						Name:            gremlinDeploymentName(v),
-						Ports: []corev1.ContainerPort{{
-							ContainerPort: 8182,
-						}},
 						Lifecycle: &corev1.Lifecycle{
 							PostStart: &corev1.Handler{
 								Exec: &corev1.ExecAction{
@@ -86,10 +85,11 @@ func (r *ReconcileCodeReadyAnalytics) gremlinDeployment(v *openshiftv1alpha1.Cod
 						},
 						LivenessProbe: &corev1.Probe{
 							Handler: corev1.Handler{
-								HTTPGet: &corev1.HTTPGetAction{
+								TCPSocket: &corev1.TCPSocketAction{
 									Port: intstr.FromInt(8182),
 								},
 							},
+					
 							InitialDelaySeconds: 60,
 							PeriodSeconds:       60,
 							TimeoutSeconds: 30,
@@ -98,7 +98,7 @@ func (r *ReconcileCodeReadyAnalytics) gremlinDeployment(v *openshiftv1alpha1.Cod
 						},
 						ReadinessProbe: &corev1.Probe{
 							Handler: corev1.Handler{
-								HTTPGet: &corev1.HTTPGetAction{
+								TCPSocket: &corev1.TCPSocketAction{
 									Port: intstr.FromInt(8182),
 								},
 							},
@@ -153,8 +153,9 @@ func (r *ReconcileCodeReadyAnalytics) gremlinDeployment(v *openshiftv1alpha1.Cod
 }
 
 func (r *ReconcileCodeReadyAnalytics) gremlinService(v *openshiftv1alpha1.CodeReadyAnalytics) *corev1.Service {
-	labels := labels(v, "gremlin")
-
+	labels := map[string]string{
+		"service": v.Spec.Gremlin.Name,
+	}
 	s := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      gremlinDeploymentName(v),
