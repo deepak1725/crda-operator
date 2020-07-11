@@ -13,8 +13,6 @@ spec:
       awsDefaultRegion: us-east-1
       githubToken: 122er
       librariesIoToken: 121212sa
-      awsAccessKeyId: AMAIAKAIAKAIAKAI
-      awsSecretAccessKey: hoHANYouAreFuckingAwesomeLcSKc3g
     database: 
       dbName: coreapi
       host:     localhost

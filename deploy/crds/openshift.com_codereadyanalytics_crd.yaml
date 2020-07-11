@@ -67,11 +67,7 @@ spec:
                   properties:
                     authUrl:
                       type: string
-                    awsAccessKeyId:
-                      type: string
                     awsDefaultRegion:
-                      type: string
-                    awsSecretAccessKey:
                       type: string
                     deploymentPrefix:
                       type: string

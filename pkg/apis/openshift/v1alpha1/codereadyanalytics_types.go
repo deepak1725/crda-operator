@@ -55,8 +55,6 @@ type CommonType struct {
 	DeploymentPrefix        string `json:"deploymentPrefix,omitempty"`
 	DynamodbPrefix          string `json:"dynamodbPrefix,omitempty"`
 	ThreeScaleAccountSecret string `json:"threeScaleAccountSecret,omitempty"`
-	AwsAccessKeyId          string `json:"awsAccessKeyId,omitempty"`
-	AwsSecretAccessKey      string `json:"awsSecretAccessKey,omitempty"`
 	AwsDefaultRegion      	string `json:"awsDefaultRegion,omitempty"`
 	GithubToken      		string `json:"githubToken,omitempty"`
 	LibrariesIoToken      	string `json:"librariesIoToken,omitempty"`

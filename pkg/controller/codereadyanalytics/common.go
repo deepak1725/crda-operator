@@ -3,7 +3,7 @@ package codereadyanalytics
 import (
 	"context"
 	openshiftv1alpha1 "operator/crda-operator/pkg/apis/openshift/v1alpha1"
-
+	"os"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -191,12 +191,12 @@ func (r *ReconcileCodeReadyAnalytics) awsSecret(cr *openshiftv1alpha1.CodeReadyA
 		},
 		Type: corev1.SecretTypeOpaque,
 		Data: map[string][]byte{
-			"aws_access_key_id":     	[]byte(cr.Spec.Config.Common.AwsAccessKeyId),
-			"s3-access-key-id":     	[]byte(cr.Spec.Config.Common.AwsAccessKeyId),
-			"aws_secret_access_key": 	[]byte(cr.Spec.Config.Common.AwsSecretAccessKey),
-			"s3-secret-access-key": 	[]byte(cr.Spec.Config.Common.AwsSecretAccessKey),
+			"aws_access_key_id":     	[]byte(os.Getenv("AWS_KEY")),
+			"s3-access-key-id":     	[]byte(os.Getenv("AWS_KEY")),
+			"aws_secret_access_key": 	[]byte(os.Getenv("AWS_SECRET")),
+			"s3-secret-access-key": 	[]byte(os.Getenv("AWS_SECRET")),
 			"sync-s3": 					[]byte("1"),
-			"aws_region": 				[]byte(cr.Spec.Config.Common.AwsSecretAccessKey),
+			"aws_region": 				[]byte(cr.Spec.Config.Common.AwsDefaultRegion),
 			"s3-bucket-for-analyses": 	[]byte("deepshar-hello"),
 		},
 	}
