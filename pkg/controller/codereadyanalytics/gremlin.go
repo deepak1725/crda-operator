@@ -8,7 +8,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func gremlinDeploymentName(v *openshiftv1alpha1.CodeReadyAnalytics) string {
@@ -72,16 +71,6 @@ func (r *ReconcileCodeReadyAnalytics) gremlinDeployment(v *openshiftv1alpha1.Cod
 									Command: []string{"post-hook.sh"},
 								},
 							},
-						},
-						Resources: corev1.ResourceRequirements{
-							Limits: corev1.ResourceList{
-                                "cpu":    resource.MustParse(v.Spec.Gremlin.Resources.Limits.CPU),
-                                "memory": resource.MustParse(v.Spec.Gremlin.Resources.Limits.Memory),
-                            },
-                            Requests: corev1.ResourceList{
-                                "cpu":    resource.MustParse(v.Spec.Gremlin.Resources.Requests.CPU),
-                                "memory": resource.MustParse(v.Spec.Gremlin.Resources.Requests.Memory),
-                            },
 						},
 						LivenessProbe: &corev1.Probe{
 							Handler: corev1.Handler{

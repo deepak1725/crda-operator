@@ -7,7 +7,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func workerDeploymentName(v *openshiftv1alpha1.CodeReadyAnalytics) string {
@@ -159,16 +158,6 @@ func (r *ReconcileCodeReadyAnalytics) workerDeployment(v *openshiftv1alpha1.Code
 									Command: []string{"worker-pre-hook.sh"},
 								},
 							},
-						},
-						Resources: corev1.ResourceRequirements{
-							Limits: corev1.ResourceList{
-                                "cpu":    resource.MustParse(v.Spec.Worker.Resources.Limits.CPU),
-                                "memory": resource.MustParse(v.Spec.Worker.Resources.Limits.Memory),
-                            },
-                            Requests: corev1.ResourceList{
-                                "cpu":    resource.MustParse(v.Spec.Worker.Resources.Requests.CPU),
-                                "memory": resource.MustParse(v.Spec.Worker.Resources.Requests.Memory),
-                            },
 						},
 						LivenessProbe: &corev1.Probe{
 							Handler: corev1.Handler{
