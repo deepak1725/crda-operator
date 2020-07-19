@@ -1,0 +1,28 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - f8a.example.com
+  resources:
+  - codereadyanalytics
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - f8a.example.com
+  resources:
+  - codereadyanalytics/status
+  verbs:
+  - get
+  - patch
+  - update

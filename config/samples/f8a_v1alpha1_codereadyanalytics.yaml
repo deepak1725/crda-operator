@@ -1,0 +1,60 @@
+apiVersion: f8a.example.com/v1alpha1
+kind: CodeReadyAnalytics
+metadata:
+  name: codereadyanalytics-sample
+spec:
+  config:
+    common:
+      authUrl: https://youareawesome.com
+      deploymentPrefix: deepshar
+      dynamodbPrefix: deepshar-dev
+      threeScaleAccountSecret: abc
+      awsDefaultRegion: us-east-1
+      githubToken: 122er
+      librariesIoToken: 121212sa
+    database: 
+      dbName: coreapi
+      host:     localhost
+      initialDatabase: postgres
+      password: coreapi
+      port: "5432"
+      username: coreapi
+  pgbouncer:
+    image: sharma1725/pgbouncer:latest
+    name: bayesian-pgbouncer
+    size: 1
+  gremlin:
+    image: quay.io/openshiftio/bayesian-gremlin:latest
+    name: bayesian-gremlin-http
+    dynamoDbEndpoint: "https://dynamodb.us-east-1.amazonaws.com"
+    size: 1
+    resources:
+      limits:
+        cpu: "1000m"
+        memory: "1536Mi"
+      requests:
+        cpu: "500m"
+        memory: "1536Mi"
+  worker:
+    name: bayesian-worker-api
+    size: 1
+    image: sharma1725/worker
+    resources:
+      limits:
+        cpu: "1536m"
+        memory: "500Mi"
+      requests:
+        cpu: "250m"
+        memory: "500Mi"
+  api-server: 
+    image: sharma1725/aserver
+    size: 1
+    containerPort: 5000
+    name: api-server
+    port: 32000
+  backbone:
+    image: sharma1725/backbone
+    size: 1
+    containerPort: 5000
+    name: backbone
+    port: 32000

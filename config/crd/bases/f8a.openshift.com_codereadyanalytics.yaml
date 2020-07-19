@@ -1,0 +1,268 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: codereadyanalytics.f8a.openshift.com
+spec:
+  group: f8a.openshift.com
+  names:
+    kind: CodeReadyAnalytics
+    listKind: CodeReadyAnalyticsList
+    plural: codereadyanalytics
+    singular: codereadyanalytics
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: CodeReadyAnalytics is the Schema for the codereadyanalytics API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: CodeReadyAnalyticsSpec defines the desired state of CodeReadyAnalytics
+          properties:
+            api-server:
+              description: ServerServiceType defines API Server Service Specs
+              properties:
+                containerPort:
+                  format: int32
+                  type: integer
+                image:
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            backbone:
+              description: BackboneServiceType defines Backbone Service Specs
+              properties:
+                containerPort:
+                  format: int32
+                  type: integer
+                image:
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            config:
+              description: Fields Required for Operator Functioning.
+              properties:
+                common:
+                  description: CommonType defines common Config Specs
+                  properties:
+                    authUrl:
+                      type: string
+                    awsDefaultRegion:
+                      type: string
+                    deploymentPrefix:
+                      type: string
+                    dynamodbPrefix:
+                      type: string
+                    githubToken:
+                      type: string
+                    librariesIoToken:
+                      type: string
+                    threeScaleAccountSecret:
+                      type: string
+                  type: object
+                database:
+                  description: DatabaseType defines Database Config Specs
+                  properties:
+                    dbName:
+                      type: string
+                    host:
+                      type: string
+                    initialDatabase:
+                      type: string
+                    password:
+                      type: string
+                    port:
+                      type: string
+                    username:
+                      type: string
+                  type: object
+              type: object
+            gremlin:
+              description: GremlinType defines Specs for Gremlin Service
+              properties:
+                dynamoDbEndpoint:
+                  type: string
+                image:
+                  type: string
+                name:
+                  type: string
+                resources:
+                  description: ResourceType defines Resource Types of Gremlin
+                  properties:
+                    limits:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                    requests:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                  type: object
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            pgbouncer:
+              description: PgbouncerType defines Specs for Pgbouncer Service
+              properties:
+                image:
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            worker:
+              description: WorkerType defines Worker Types
+              properties:
+                image:
+                  type: string
+                name:
+                  type: string
+                resources:
+                  description: ResourceType defines Resource Types of Gremlin
+                  properties:
+                    limits:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                    requests:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                  type: object
+                size:
+                  format: int32
+                  type: integer
+              type: object
+          type: object
+        status:
+          description: CodeReadyAnalyticsStatus defines the observed state of CodeReadyAnalytics
+          properties:
+            api-server:
+              description: ServerServiceType defines API Server Service Specs
+              properties:
+                containerPort:
+                  format: int32
+                  type: integer
+                image:
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            backbone:
+              description: Status fields
+              properties:
+                containerPort:
+                  format: int32
+                  type: integer
+                image:
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            gremlin:
+              description: GremlinType defines Specs for Gremlin Service
+              properties:
+                dynamoDbEndpoint:
+                  type: string
+                image:
+                  type: string
+                name:
+                  type: string
+                resources:
+                  description: ResourceType defines Resource Types of Gremlin
+                  properties:
+                    limits:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                    requests:
+                      description: LimitType defines Resource Types of Gremlin
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      type: object
+                  type: object
+                size:
+                  format: int32
+                  type: integer
+              type: object
+            pgbouncer:
+              description: PgbouncerType defines Specs for Pgbouncer Service
+              properties:
+                image:
+                  type: string
+                name:
+                  type: string
+                size:
+                  format: int32
+                  type: integer
+              type: object
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
