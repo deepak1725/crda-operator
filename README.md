@@ -21,31 +21,25 @@ This Operator will deploy necessary Services in [CRDA Plateform](https://github.
 ## Local Installation:
 * Export `AWS_KEY` and `AWS_SECRET` in System Environment. Verify by: `printenv | grep AWS`.  
 
+
+### One time setup
+
+* You can modify preset config values at [f8a_v1alpha1_codereadyanalytics.yaml](config/samples/f8a_v1alpha1_codereadyanalytics.yaml) that caters to your needs and then generate image for same.
+
+* Build Operator Image: 
+    - `export IMG=quay.io/{username}/crda-operator`
+    - `make docker-build docker-push IMG=$IMG`
+
 I have identified 2 possible development scenarios:
 1. CRDA Development
 2. Operator Development
 
-
-### One time setup
-
-* You can see preset config values at [com_v1alpha1_codereadyanalytics_cr.yaml](deploy/crds/openshift.com_v1alpha1_codereadyanalytics_cr.yaml). 
-Feel free to update any of configuration values as per requirements.
-
-* Modify config values of Operator that caters to your needs and then generate image for same.
-
-* Generate Image: `operator-sdk build {username}/{repo}` 
-Ex: `operator-sdk build sharma1725/crda-operator`
-
-* Push Image to registry: `docker push {username}/{repo}`
-
-
-
 1. **CRDA Development**
 
-Here i assume you have Operator Image, build in previous step.
-* Update Image to your version in `operator.yaml`
-* Deploy Operator: `kubectl apply -f deploy/operator.yaml`
-
+Here i assume you have Operator Image, built in previous step. This section focussed on development of CRDA Services.
+* Deploy CRD: `make install`
+* Update Operator Image in `crda-operator-new/config/manager/kustomization.yaml`
+* Deploy Operator: `make deploy`
 
 
 2. **Operator Development**
