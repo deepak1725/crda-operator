@@ -1,4 +1,4 @@
-apiVersion: f8a.example.com/v1alpha1
+apiVersion: f8a.openshift.com/v1alpha1
 kind: CodeReadyAnalytics
 metadata:
   name: codereadyanalytics-sample

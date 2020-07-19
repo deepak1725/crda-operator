@@ -61,6 +61,7 @@ func main() {
 		Port:               9443,
 		LeaderElection:     enableLeaderElection,
 		LeaderElectionID:   "bf9b5b17.example.com",
+		Namespace:          "crda",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
