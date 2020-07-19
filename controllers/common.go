@@ -234,8 +234,8 @@ func (r *CodeReadyAnalyticsReconciler) geminiSecret(cr *f8av1alpha1.CodeReadyAna
 		},
 		Type: corev1.SecretTypeOpaque,
 		StringData: map[string]string{
-			"gemini-sa-Client-id":     `test`,
-			"gemini-sa-Client-secret": `secret`,
+			"gemini-sa-client-id":     `test`,
+			"gemini-sa-client-secret": `secret`,
 		},
 	}
 	return secret
