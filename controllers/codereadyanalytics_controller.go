@@ -18,7 +18,7 @@ package controllers
 
 import (
 	"context"
-	
+
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -136,10 +136,10 @@ func (r *CodeReadyAnalyticsReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 	}
 
 	// == API Server Service  ==========
-	result, err = r.ensureDeployment(req, instance, r.apiDeployment(instance))
-	if result != nil {
-		return *result, err
-	}
+	// result, err = r.ensureDeployment(req, instance, r.apiDeployment(instance))
+	// if result != nil {
+	// 	return *result, err
+	// }
 
 	result, err = r.ensureService(req, instance, r.apiService(instance))
 	if result != nil {

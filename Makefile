@@ -115,3 +115,6 @@ bundle: manifests
 # Build the bundle image.
 bundle-build:
 	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
+
+crda: 
+	make install && kubectl apply -f config/samples/f8a_v1alpha1_codereadyanalytics.yaml -n crda && make run ENABLE_WEBHOOKS=false 

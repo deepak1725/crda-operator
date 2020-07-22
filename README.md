@@ -30,34 +30,17 @@ This Operator will deploy necessary Services in [CRDA Plateform](https://github.
     - `export IMG=quay.io/{username}/crda-operator`
     - `make docker-build docker-push IMG=$IMG`
 
-I have identified 2 possible development scenarios:
-1. CRDA Development
-2. Operator Development
-
-1. **CRDA Development**
-
-Here i assume you have Operator Image, built in previous step. This section focussed on development of CRDA Services.
-* Deploy CRD: `make install`
-* Update Operator Image in `crda-operator-new/config/manager/kustomization.yaml`
-* Deploy Operator: `make deploy`
+I have identified following possible development scenarios:
+1. CRDA Service Development
 
 
-2. **Operator Development**
+1. **CRDA Service Development**
 
-PR's are Welcome. For that, you need to run operator locally:
+* Run Operator: `make crda`
 
-* Create Namespace `kubectl create ns crda` 
-* Create Role `kubectl apply -f deploy/role.yaml`
-* Create Service Account `kubectl apply -f deploy/service_account.yaml`
-* Create Role Binding `kubectl apply -f deply/service_binding.yaml`
-* Deploy CRD: `kubectl apply -f deploy/crds/openshift.com_codereadyanalytics_crd.yaml`
-* Deploy CR: `kubectl apply -f deploy/crds/openshift.com_v1alpha1_codereadyanalytics_cr.yaml`
 
-* After changes are done, start operator to witness changes.
 
-`operator-sdk run up --local`
-
-This should deploy all the custom resources (CR) in local cluster in said namespace.
+This should deploy all the custom resources (CR) in local cluster in `crda` namespace.
 
 
 * Execute `kubectl get all -n crda`
