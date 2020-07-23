@@ -26,15 +26,12 @@ This Operator will deploy necessary Services in [CRDA Plateform](https://github.
 
 * You can modify preset config values at [f8a_v1alpha1_codereadyanalytics.yaml](config/samples/f8a_v1alpha1_codereadyanalytics.yaml) that caters to your needs and then generate image for same.
 
-* Build Operator Image: 
-    - `export IMG=quay.io/{username}/crda-operator`
-    - `make docker-build docker-push IMG=$IMG`
+Following possible development scenarios:
 
-I have identified following possible development scenarios:
-1. CRDA Service Development
+CRDA Service Development
 
 
-1. **CRDA Service Development**
+ **CRDA Service Development**
 
 * Create Namespace: `kubectl create ns crda`
 * Run Operator: `make crda`
