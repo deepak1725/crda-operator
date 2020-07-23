@@ -26,7 +26,6 @@ This Operator will deploy necessary Services in [CRDA Plateform](https://github.
 
 * You can modify preset config values at [f8a_v1alpha1_codereadyanalytics.yaml](config/samples/f8a_v1alpha1_codereadyanalytics.yaml) that caters to your needs and then generate image for same.
 
-Following possible development scenarios:
 
 CRDA Service Development
 
