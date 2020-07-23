@@ -36,6 +36,7 @@ I have identified following possible development scenarios:
 
 1. **CRDA Service Development**
 
+* Create Namespace: `kubectl create ns crda`
 * Run Operator: `make crda`
 
 
