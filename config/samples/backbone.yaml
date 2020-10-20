@@ -1,0 +1,147 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: f8a-server-backbone
+  name: f8a-server-backbone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: f8a-server-backbone
+  template:
+    metadata:
+      labels:
+        service: f8a-server-backbone
+    spec:
+      containers:
+      - command:
+        - /bin/entrypoint.sh
+        env:
+        - name: BAYESIAN_GREMLIN_HTTP_SERVICE_HOST
+          value: bayesian-gremlin-http
+        - name: BAYESIAN_GREMLIN_HTTP_SERVICE_PORT
+          value: "8182"
+        - name: DEPLOYMENT_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: bayesian-config
+              key: deployment-prefix
+        - name: WORKER_ADMINISTRATION_REGION
+          value: "api"
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: worker
+              key: sentry_dsn
+        - name: PGBOUNCER_SERVICE_HOST
+          value: bayesian-pgbouncer
+        - name: PGBOUNCER_SERVICE_PORT
+          value: "5432"
+        - name: LICENSE_SERVICE_HOST
+          value: f8a-license-analysis
+        - name: LICENSE_SERVICE_PORT
+          value: "6162"
+        - name: PGM_SERVICE_HOST
+          value: bayesian-kronos
+        - name: CHESTER_SERVICE_HOST
+          value: f8a-npm-insights
+        - name: PYPI_SERVICE_HOST
+          value: f8a-pypi-insights
+        - name: GOLANG_SERVICE_HOST
+          value: f8a-golang-insights
+        - name: HPF_SERVICE_HOST
+          value: f8a-hpf-insights
+        - name: PGM_SERVICE_PORT
+          value: "6006"
+        - name: POSTGRESQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: coreapi-postgres
+              key: database
+        - name: POSTGRESQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: coreapi-postgres
+              key: password
+        - name: POSTGRESQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: coreapi-postgres
+              key: username
+        - name: AWS_SQS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: aws_access_key_id
+        - name: AWS_SQS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: aws_secret_access_key
+        - name: API_BACKBONE_SERVICE_PORT
+          value: "5000"
+        - name: API_BACKBONE_SERVICE_TIMEOUT
+          value: "300"
+        - name: NUMBER_WORKER_PROCESS
+          value: "4"
+        - name: CLASS_TYPE
+          value: "sync"
+        - name: FLASK_LOGGING_LEVEL
+          value: "INFO"
+        - name: METRICS_ENDPOINT_URL
+          value: "metrics-accumulator"
+        - name: METRICS_ENDPOINT_URL_PORT
+          value: "5200"
+        - name: DISABLE_UNKNOWN_PACKAGE_FLOW
+          value: "0"
+
+        image: "sharma1725/backbone:latest"
+        name: f8a-server-backbone
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 30
+          failureThreshold: 3
+          successThreshold: 1
+          httpGet:
+            path: /api/liveness
+            port: 5000
+        readinessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 60
+          timeoutSeconds: 30
+          failureThreshold: 3
+          successThreshold: 1
+          httpGet:
+            path: /api/readiness
+            port: 5000
+        resources:
+          requests:
+            cpu: "128m"
+            memory: "512Mi"
+          limits:
+            cpu: "128m"
+            memory: "512Mi"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: f8a-server-backbone
+  name: f8a-server-backbone
+  namespace: crda
+spec:
+  ports:
+  - port: 5000
+    name: "5000"
+    targetPort: 5000
+    protocol: TCP
+    nodePort:   32100
+  type: LoadBalancer
+  selector:
+    service: f8a-server-backbone

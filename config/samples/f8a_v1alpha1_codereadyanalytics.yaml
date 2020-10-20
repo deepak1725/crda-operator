@@ -12,6 +12,8 @@ spec:
       awsDefaultRegion: us-east-1
       githubToken: 122er
       librariesIoToken: 121212sa
+      s3BucketForAnalyses: deepshar-bayesian-core-data
+      s3BucketForPackageAnalyses: deepshar-bayesian-core-package-data
     database: 
       dbName: coreapi
       host:     localhost
@@ -19,6 +21,12 @@ spec:
       password: coreapi
       port: "5432"
       username: coreapi
+    npmInsights:
+      bucket: "deepshar-cvae-insights"
+    pypiInsights:
+      bucket: "deepshar-hpf-pypi-insights"
+    mavenInsights:
+      bucket: "deepshar-hpf-maven-insights"
   pgbouncer:
     image: sharma1725/pgbouncer:latest
     name: bayesian-pgbouncer
@@ -27,6 +35,7 @@ spec:
     image: quay.io/openshiftio/bayesian-gremlin:latest
     name: bayesian-gremlin-http
     dynamoDbEndpoint: "https://dynamodb.us-east-1.amazonaws.com"
+    developerAnalyticsAuditReportS3: "deepshar-developer-analytics-audit-report"
     size: 1
     resources:
       limits:
@@ -58,3 +67,7 @@ spec:
     containerPort: 5000
     name: backbone
     port: 32000
+  snykSecrets:
+    tokenEncryptionKey: token_key
+    iss: iss
+    token: token

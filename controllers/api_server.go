@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+
 	f8av1alpha1 "github.com/deepak1725/crda-operator/api/v1alpha1"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -137,7 +138,7 @@ func (r *CodeReadyAnalyticsReconciler) apiDeployment(v *f8av1alpha1.CodeReadyAna
 							},
 							{
 								Name:  "F8_API_BACKBONE_HOST",
-								Value: "backbone",
+								Value: "http://f8a-server-backbone:5000",
 							},
 							{
 								Name:  "METRICS_ACCUMULATOR_HOST",

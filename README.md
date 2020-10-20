@@ -14,7 +14,7 @@ This Operator will deploy necessary Services in [CRDA Plateform](https://github.
 * [go](https://golang.org/dl/) version v1.13+.
 * [docker](https://docs.docker.com/install/) version 17.03+.
 * [kustomize](https://sigs.k8s.io/kustomize/docs/INSTALL.md) v3.1.0+
-* [operator-sdk](https://sdk.operatorframework.io/docs/install-operator-sdk/)
+* [operator-sdk](https://v0-19-x.sdk.operatorframework.io/docs/install-operator-sdk/)
 
 
 

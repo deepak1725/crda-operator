@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: Service
+metadata:
+    labels:
+        service: bayesian-data-importer
+    name: bayesian-data-importer
+spec:
+    ports:
+    - name: "9192"
+      port: 9192
+      protocol: TCP
+      targetPort: 9192
+    type: LoadBalancer
+    selector:
+        service: bayesian-data-importer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    labels:
+        service: bayesian-data-importer
+    name: bayesian-data-importer
+    namespace: crda
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            service: bayesian-data-importer
+    template:
+        metadata:
+            labels:
+                service: bayesian-data-importer
+        spec:
+            containers:
+                -   env:
+                    - name: DATA_IMPORTER_SERVICE_PORT
+                      value: "9192"
+                    - name: NUMBER_WORKER_PROCESS
+                      value: "2"
+                    - name: DATA_IMPORTER_SERVICE_TIMEOUT
+                      value: "3600"
+                    - name: GREMLIN_USE_SECURE_CONNECTION
+                      value: "false"
+                    - name: BAYESIAN_GREMLIN_HTTPINGESTION_SERVICE_HOST
+                      value: "bayesian-gremlin-httpingestion"
+                    - name: BAYESIAN_GREMLIN_HTTPINGESTION_SERVICE_PORT
+                      value: "8182"
+                    - name: GREMLIN_QUERY_SIZE
+                      value: "25"
+                    - name: AWS_EPV_BUCKET
+                      valueFrom:
+                        configMapKeyRef:
+                            name: bayesian-config
+                            key: s3-bucket-for-analyses
+                    - name: AWS_PKG_BUCKET
+                      valueFrom:
+                        configMapKeyRef:
+                            name: bayesian-config
+                            key: s3-bucket-for-package-analyses
+                    - name: POSTGRESQL_DATABASE
+                      valueFrom:
+                        secretKeyRef:
+                            name: coreapi-postgres
+                            key: database
+                    - name: SENTRY_DSN
+                      valueFrom:
+                        secretKeyRef:
+                            name: worker
+                            key: sentry_dsn
+                    - name: POSTGRESQL_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                            name: coreapi-postgres
+                            key: password
+                    - name: POSTGRESQL_USER
+                      valueFrom:
+                        secretKeyRef:
+                            name: coreapi-postgres
+                            key: username
+                    - name: AWS_S3_ACCESS_KEY_ID
+                      valueFrom:
+                        secretKeyRef:
+                            name: aws
+                            key: s3-access-key-id
+                    - name: AWS_S3_SECRET_ACCESS_KEY
+                      valueFrom:
+                        secretKeyRef:
+                            name: aws
+                            key: s3-secret-access-key
+                    - name: FLASK_LOGGING_LEVEL
+                      value: "INFO"
+                    - name: SKIP_SCHEMA
+                      value: "true"
+                    image: "quay.io/openshiftio/bayesian-data-model-importer"
+                    imagePullPolicy: Always
+                    name: bayesian-data-importer
+                    ports:
+                    - containerPort: 9192
+                    resources:
+                        requests:
+                            cpu: "100m"
+                            memory: "512Mi"
+                        limits:
+                            cpu: "300m"
+                            memory: "512Mi"
+                    readinessProbe:
+                        httpGet:
+                            path: /api/v1/readiness
+                            port: 9192
+                            scheme: HTTP
+                        initialDelaySeconds: 30
+                        periodSeconds: 60
+                        timeoutSeconds: 30
+                    livenessProbe:
+                        httpGet:
+                            path: /api/v1/liveness
+                            port: 9192
+                            scheme: HTTP
+                        initialDelaySeconds: 30
+                        periodSeconds: 60
+                        timeoutSeconds: 30
+                    lifecycle:
+                        postStart:
+                            exec:
+                                command: ["/populate_schema.py"]
+
+

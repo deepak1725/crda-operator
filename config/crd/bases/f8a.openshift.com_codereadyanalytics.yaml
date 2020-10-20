@@ -82,6 +82,10 @@ spec:
                       type: string
                     librariesIoToken:
                       type: string
+                    s3BucketForAnalyses:
+                      type: string
+                    s3BucketForPackageAnalyses:
+                      type: string
                     threeScaleAccountSecret:
                       type: string
                   type: object

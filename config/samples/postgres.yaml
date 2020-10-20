@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: bayesian-pgbouncer
+  name: bayesian-pgbouncer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        service: bayesian-pgbouncer
+  template:
+    metadata:
+      labels:
+        service: bayesian-pgbouncer
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: "coreapi"
+        - name: POSTGRESQL_INITIAL_DATABASE
+          value: "coreapi"
+        - name: POSTGRES_PASSWORD
+          value: coreapi
+        - name: POSTGRES_USER
+          value: "coreapi"
+        - name: POSTGRES_SERVICE_HOST
+          value: localhost
+        - name: POSTGRES_SERVICE_PORT
+          value: "5432"
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+        image: "sharma1725/pgbouncer"
+        name: bayesian-pgbouncer
+        livenessProbe:
+          exec:
+            command: ["health-check-probe.sh"]
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["health-check-probe.sh"]
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: bayesian-pgbouncer
+  name: bayesian-pgbouncer
+spec:
+  type: LoadBalancer
+  ports:
+  - name: "5432"
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    service: bayesian-pgbouncer

@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+      service: bayesian-api
+  annotations:
+    description: bayesian-api
+  name: bayesian-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: bayesian-api
+  template:
+    metadata:
+      labels:
+        service: bayesian-api
+    spec:
+      containers:
+      - image: sharma1725/aserver:latest
+        name: bayesian-api
+        env:
+        -  name: GREMLIN_QUERY_SIZE
+           value: "10"
+        -  name: DEPLOYMENT_PREFIX
+           value: "deepshar"
+        -  name: WORKER_ADMINISTRATION_REGION
+           value: "api"
+        -  name: BAYESIAN_COMPONENT_TAGGED_COUNT
+           value: "2"
+        -  name: COMPONENT_ANALYSES_LIMIT
+           value: "10"
+        -  name: DEPLOYMENT_PREFIX
+           value: "10"
+        -  name: WORKER_ADMINISTRATION_REGION
+           value: "api"
+        -  name: F8_API_BACKBONE_HOST
+           value: "http://f8a-server-backbone:5000"
+        -  name: METRICS_ACCUMULATOR_HOST
+           value: "host"
+        -  name: METRICS_ACCUMULATOR_PORT
+           value: "22"
+        -  name: FUTURES_SESSION_WORKER_COUNT
+           value: "100"
+        -  name: PGBOUNCER_SERVICE_HOST
+           value: "http://pgbouncer-deepak1725-fabric8-analytics.devtools-dev.ext.devshift.net:5432/"
+        -  name: OSIO_AUTH_URL
+           value: "bayesian-pgbouncer"
+        -  name: BAYESIAN_FETCH_PUBLIC_KEY
+           value: "bayesian-pgbouncer"
+        -  name: FABRIC8_ANALYTICS_JWT_AUDIENCE
+           value: "fabric8-online-platform,openshiftio-public,https://prod-preview.openshift.io,https://openshift.io"
+        -  name: INVOKE_API_WORKERS
+           value: "1"
+        -  name: SHOW_TRANSITIVE_REPORT
+           value: "true"
+        -  name: STACK_ANALYSIS_REQUEST_TIMEOUT
+           value: "30"
+        -  name: FLASK_LOGGING_LEVEL
+           value: "INFO"
+        -  name: POSTGRESQL_USER
+           value: "hey"
+        -  name: POSTGRESQL_PASSWORD
+           value: "bey"
+        -  name: POSTGRESQL_DATABASE
+           value: "db"
+        -  name: AWS_SQS_ACCESS_KEY_ID
+           value: "sqs_key"
+        -  name: AWS_SQS_SECRET_ACCESS_KEY
+           value: "sqs_key"
+        -  name: THREESCALE_ACCOUNT_SECRET
+           value: "deepsharji"
+        ports:
+          - containerPort: 5000
+            protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            tcpSocket:
+              port: 5000
+          readinessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            failureThreshold: 3
+            successThreshold: 1
+            tcpSocket:
+              port: 5000
+            timeoutSeconds: 10
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1000m"
+      restartPolicy: Always

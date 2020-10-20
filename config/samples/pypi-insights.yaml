@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: f8a-pypi-insights
+  name: f8a-pypi-insights
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: f8a-pypi-insights
+  template:
+    metadata:
+      labels:
+        service: f8a-pypi-insights
+    spec:
+      containers:
+      - command:
+        - /bin/entrypoint.sh
+        env:
+        - name: DEPLOYMENT_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: bayesian-config
+              key: deployment-prefix
+        - name: SERVICE_PORT
+          value: "6006"
+        - name: SERVICE_TIMEOUT
+          value: "900"
+        - name: MIN_CONFIDENCE_SCORE
+          value: "30"
+        - name: AWS_S3_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: aws_access_key_id
+              name: hpf-pypi-insights-s3
+        - name: AWS_S3_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: aws_secret_access_key
+              name: hpf-pypi-insights-s3
+        - name: FLASK_LOGGING_LEVEL
+          value: "INFO"
+        - name: AWS_S3_BUCKET_NAME
+          valueFrom:
+            secretKeyRef:
+              key: bucket
+              name: hpf-pypi-insights-s3
+        - name: MODEL_VERSION
+          value: "2019-01-03"
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: worker
+              key: sentry_dsn
+        name: f8a-pypi-insights
+        image: "quay.io/openshiftio/fabric8-analytics-f8a-pypi-insights"
+        ports:
+        - containerPort: 6006
+        livenessProbe:
+          httpGet:
+            path: /api/v1/liveness
+            port: 6006
+          initialDelaySeconds: 15
+          periodSeconds: 60
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/v1/readiness
+            port: 6006
+          initialDelaySeconds: 15
+          periodSeconds: 60
+          timeoutSeconds: 30
+        resources:
+          requests:
+            cpu: "300m"
+            memory: "200Mi"
+          limits:
+            cpu: "1000m"
+            memory: "512Mi"
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: f8a-pypi-insights
+  name: f8a-pypi-insights
+spec:
+  ports:
+  - port: 6006
+    targetPort: 0
+  selector:
+    service: f8a-pypi-insights

@@ -45,11 +45,12 @@ type PgbouncerType struct {
 
 // GremlinType defines Specs for Gremlin Service
 type GremlinType struct {
-	Name             string       `json:"name,omitempty"`
-	Size             int32        `json:"size,omitempty"`
-	Image            string       `json:"image,omitempty"`
-	DynamoDbEndpoint string       `json:"dynamoDbEndpoint,omitempty"`
-	Resources        ResourceType `json:"resources,omitempty"`
+	Name                            string       `json:"name,omitempty"`
+	Size                            int32        `json:"size,omitempty"`
+	Image                           string       `json:"image,omitempty"`
+	DynamoDbEndpoint                string       `json:"dynamoDbEndpoint,omitempty"`
+	Resources                       ResourceType `json:"resources,omitempty"`
+	DeveloperAnalyticsAuditReportS3 string       `json:"resources,omitempty"`
 }
 
 // DatabaseType defines Database Config Specs
@@ -64,19 +65,29 @@ type DatabaseType struct {
 
 // CommonType defines common Config Specs
 type CommonType struct {
-	AuthUrl                 string `json:"authUrl,omitempty"`
-	DeploymentPrefix        string `json:"deploymentPrefix,omitempty"`
-	DynamodbPrefix          string `json:"dynamodbPrefix,omitempty"`
-	ThreeScaleAccountSecret string `json:"threeScaleAccountSecret,omitempty"`
-	AwsDefaultRegion        string `json:"awsDefaultRegion,omitempty"`
-	GithubToken             string `json:"githubToken,omitempty"`
-	LibrariesIoToken        string `json:"librariesIoToken,omitempty"`
+	AuthUrl                    string `json:"authUrl,omitempty"`
+	DeploymentPrefix           string `json:"deploymentPrefix,omitempty"`
+	DynamodbPrefix             string `json:"dynamodbPrefix,omitempty"`
+	ThreeScaleAccountSecret    string `json:"threeScaleAccountSecret,omitempty"`
+	AwsDefaultRegion           string `json:"awsDefaultRegion,omitempty"`
+	GithubToken                string `json:"githubToken,omitempty"`
+	LibrariesIoToken           string `json:"librariesIoToken,omitempty"`
+	S3BucketForAnalyses        string `json:"s3BucketForAnalyses,omitempty"`
+	S3BucketForPackageAnalyses string `json:"s3BucketForPackageAnalyses,omitempty"`
 }
 
 // ConfigType defines Configuration Specs
 type ConfigType struct {
-	Common   CommonType   `json:"common,omitempty"`
-	Database DatabaseType `json:"database,omitempty"`
+	Common        CommonType   `json:"common,omitempty"`
+	Database      DatabaseType `json:"database,omitempty"`
+	NpmInsights   InsightsType `json:"npmInsights,omitempty"`
+	PypiInsights  InsightsType `json:"pypiInsights,omitempty"`
+	MavenInsights InsightsType `json:"mavenInsights,omitempty"`
+}
+
+// InsightsType defines Configuration Specs
+type InsightsType struct {
+	Bucket string `json:"bucket,omitempty"`
 }
 
 // LimitType defines Resource Types of Gremlin
@@ -99,6 +110,13 @@ type WorkerType struct {
 	Resources ResourceType `json:"resources,omitempty"`
 }
 
+// snykSecretsType defines Worker Types
+type snykSecretsType struct {
+	TokenEncryptionKey string `json:"tokenEncryptionKey,omitempty"`
+	Iss                string `json:"iss,omitempty"`
+	Token              string `json:"token,omitempty"`
+}
+
 // CodeReadyAnalyticsSpec defines the desired state of CodeReadyAnalytics
 type CodeReadyAnalyticsSpec struct {
 	// Fields Required for Operator Functioning.
@@ -108,6 +126,7 @@ type CodeReadyAnalyticsSpec struct {
 	Pgbouncer        PgbouncerType       `json:"pgbouncer,omitempty"`
 	Gremlin          GremlinType         `json:"gremlin,omitempty"`
 	Worker           WorkerType          `json:"worker,omitempty"`
+	SnykSecrets      snykSecretsType     `json:"snykSecrets,omitempty"`
 }
 
 // CodeReadyAnalyticsStatus defines the observed state of CodeReadyAnalytics

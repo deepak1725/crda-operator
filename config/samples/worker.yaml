@@ -1,0 +1,182 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    labels:
+      service: bayesian-worker-api
+    name: bayesian-worker-api
+spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        service: bayesian-worker-api
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          service: bayesian-worker-api
+      spec:
+        containers:
+        - env:
+          - name: OPENSHIFT_DEPLOYMENT
+            value: "1"
+          - name: DEPLOYMENT_PREFIX
+            valueFrom:
+              configMapKeyRef:
+                name: bayesian-config
+                key: deployment-prefix
+          - name: WORKER_ADMINISTRATION_REGION
+            value: api
+          - name: WORKER_EXCLUDE_QUEUES
+            value: "GraphImporterTask"
+          - name: WORKER_INCLUDE_QUEUES
+            value: ""
+          - name: WORKER_RUN_DB_MIGRATIONS
+            value: "1"
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: worker
+                key: sentry_dsn
+          - name: POSTGRESQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: coreapi-postgres
+                key: database
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: coreapi-postgres
+                key: password
+          - name: POSTGRESQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: coreapi-postgres
+                key: username
+          - name: POSTGRESQL_INITIAL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: coreapi-postgres
+                key: initial-database
+          - name: AWS_SQS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: aws_access_key_id
+          - name: AUTH_SERVICE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: bayesian-config
+                key: auth-url
+          - name: NOTIFICATION_SERVICE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: bayesian-config
+                key: notification-url
+          - name: AWS_SQS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: aws_secret_access_key
+          - name: AWS_S3_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+               name: aws
+               key: s3-access-key-id
+          - name: AWS_S3_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: s3-secret-access-key
+          - name: BAYESIAN_SYNC_S3
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: sync-s3
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: worker
+                key: github-token
+          - name: LIBRARIES_IO_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: worker
+                key: libraries-io-token
+          - name: PGBOUNCER_SERVICE_HOST
+            value: bayesian-pgbouncer
+          - name: PGM_SERVICE_HOST
+            value: bayesian-kronos
+          - name: MAX_COMPANION_PACKAGES
+            value: "4"
+          - name: MAX_ALTERNATE_PACKAGES
+            value: "2"
+          - name: OUTLIER_THRESHOLD
+            value: "0.88"
+          - name: UNKNOWN_PACKAGES_THRESHOLD
+            value: "0.3"
+          - name: LICENSE_SERVICE_HOST
+            value: f8a-license-analysis
+          - name: PGM_SERVICE_PORT
+            value: "6006"
+          - name: LICENSE_SERVICE_PORT
+            value: "6162"
+          - name: F8A_SERVER_SERVICE_HOST
+            value: bayesian-api
+          - name: GIT_COMMITTER_NAME
+            value: "rhdt-dep-analytics"
+          - name: GIT_COMMITTER_EMAIL
+            value: "rhdt-dep-analytics@example.com"
+          - name: F8_API_BACKBONE_HOST
+            value: "http://f8a-server-backbone:5000"
+          - name: F8A_GEMINI_SERVER_SERVICE_HOST
+            value: "http://f8a-gemini-server:5000"
+          - name: AWS_S3_BUCKET_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: bayesian-config
+                key: s3-bucket-for-analyses
+          # this won't get used if running with SQS
+          - name: RABBITMQ_SERVICE_SERVICE_HOST
+            value: bayesian-broker
+          - name: GEMINI_SA_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: gemini-server
+                key: gemini-sa-client-id
+          - name: GEMINI_SA_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: gemini-server
+                key: gemini-sa-client-secret
+          - name: F8A_AUTH_SERVICE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: bayesian-config
+                key: auth-url
+          image: sharma1725/worker
+          lifecycle:
+            postStart:
+              exec:
+                command: ["worker-pre-hook.sh"]
+          name: bayesian-worker
+          readinessProbe:
+            exec:
+              command: ["worker-readiness.sh"]
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            timeoutSeconds: 30
+          livenessProbe:
+            exec:
+              command: ["worker-liveness.sh"]
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            timeoutSeconds: 30
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: "250m"
+            limits:
+              memory: 1536Mi
+              cpu: "500m"
+        restartPolicy: Always

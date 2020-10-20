@@ -1,0 +1,79 @@
+apiVersion:  batch/v1beta1
+kind: CronJob
+metadata:
+    name: f8a-graph-cve-sync
+    annotations:
+      description: f8a-graph-cve-sync
+spec:
+    successfulJobsHistoryLimit: 4
+    failedJobsHistoryLimit: 1
+    concurrencyPolicy: "Forbid"
+    schedule: "0 */6 * * *"
+    jobTemplate:
+      spec:
+        template:
+          spec:
+            restartPolicy: Never
+            containers:
+            - name: f8a-graph-cve-sync
+              image: "yusufzainee/graph21"
+              env:
+                - name: SYNC_MODE
+                  value: "diff"
+                - name: DRY_RUN
+                  value: "false"
+                - name: SNYK_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: snyk-secrets
+                      key: token
+                - name: SNYK_URL
+                  value: "https://snyk.io/partners/api/v4/vulndb/feed.json"
+                - name: SNYK_INGESTION_FORCE_RUN
+                  value: "True"
+                - name: SNYK_INGESTION_RUN_TIME
+                  value: "00"
+                - name: SNYK_FEED_SAVE_DAYS
+                  value: "6"
+                - name: SNYK_DELTA_FEED_OFFSET
+                  value: "1"
+                - name: SELECTIVE_ECOSYSTEM_SNYK_SYNC
+                  value: "golang"
+                - name: SNYK_DELTA_FEED_MODE
+                  value: "false"
+                - name: SNYK_DRY_RUN
+                  value: "false"
+                - name: DISABLE_SNYK_SYNC_OPERATION
+                  value: "false"
+                - name: SNYK_ISS
+                  valueFrom:
+                    secretKeyRef:
+                      name: snyk-secrets
+                      key: iss
+                - name: REPORT_BUCKET_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: developer-analytics-audit-report-s3
+                      key: bucket
+                - name: AWS_S3_SECRET_ACCESS_KEY_REPORT_BUCKET
+                  valueFrom:
+                    secretKeyRef:
+                      name: aws
+                      key: s3-secret-access-key
+                - name: AWS_S3_ACCESS_KEY_ID_REPORT_BUCKET
+                  valueFrom:
+                    secretKeyRef:
+                      name: aws
+                      key: s3-access-key-id
+                - name: AWS_S3_REGION
+                  valueFrom:
+                    configMapKeyRef:
+                      name: bayesian-config
+                      key: aws-default-region
+              resources:
+                requests:
+                  memory: "1024Mi"
+                  cpu: "250m"
+                limits:
+                  memory: "2048Mi"
+                  cpu: "500m"

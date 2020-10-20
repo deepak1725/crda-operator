@@ -1,0 +1,102 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+    labels:
+      service: bayesian-gremlin-httpingestion
+    name: bayesian-gremlin-httpingestion
+spec:
+    ports:
+    - name: "8182"
+      port: 8182
+      protocol: TCP
+      targetPort: 8182
+    selector:
+        service: bayesian-gremlin-httpingestion
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    labels:
+      service: bayesian-gremlin-httpingestion
+    name: bayesian-gremlin-httpingestion
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            service: bayesian-gremlin-httpingestion
+    strategy:
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          service: bayesian-gremlin-httpingestion
+      spec:
+        containers:
+        - env:
+          - name: REST
+            value: "1"
+          - name: DYNAMODB_CLIENT_ENDPOINT
+            value: "https://dynamodb.us-east-1.amazonaws.com"
+          - name: DYNAMODB_PREFIX
+            valueFrom:
+               configMapKeyRef:
+                 name: bayesian-config
+                 key: "dynamodb-prefix"
+          - name: DYNAMODB_INSTANCE_PREFIX
+            value: ""
+          - name: DYNAMODB_CLIENT_CREDENTIALS_CLASS_NAME
+            value: com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: aws_access_key_id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: aws_secret_access_key
+          - name: AWS_DEFAULT_REGION
+            valueFrom:
+               secretKeyRef:
+                 name: aws
+                 key: aws_region
+          - name: JAVA_OPTIONS
+            value: ""
+          image: quay.io/openshiftio/bayesian-gremlin
+          lifecycle:
+            postStart:
+              exec:
+                command: ["post-hook.sh"]
+          imagePullPolicy: Always
+          name: bayesian-gremlin
+          ports:
+          - containerPort: 8182
+            protocol: TCP
+          resources:
+            requests:
+              memory: "1536Mi"
+              cpu: "500m"
+            limits:
+              memory: "1536Mi"
+              cpu: "1000m"
+          livenessProbe:
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+            tcpSocket:
+              port: 8182
+          readinessProbe:
+            tcpSocket:
+              port: 8182
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            timeoutSeconds: 30
+        restartPolicy: Always

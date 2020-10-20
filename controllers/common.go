@@ -2,13 +2,14 @@ package controllers
 
 import (
 	"context"
+	"os"
+
 	f8av1alpha1 "github.com/deepak1725/crda-operator/api/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"os"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -155,6 +156,85 @@ func (r *CodeReadyAnalyticsReconciler) postgresSecret(cr *f8av1alpha1.CodeReadyA
 	}
 	return secret
 }
+func (r *CodeReadyAnalyticsReconciler) hpfSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "hpf-pypi-insights-s3",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: "Opaque",
+		StringData: map[string]string{
+			"bucket":                cr.Spec.Config.PypiInsights.Bucket,
+			"aws_access_key_id":     os.Getenv("AWS_KEY"),
+			"aws_secret_access_key": os.Getenv("AWS_SECRET"),
+		},
+	}
+	return secret
+}
+func (r *CodeReadyAnalyticsReconciler) snykSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "snyk-secrets",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: "Opaque",
+		StringData: map[string]string{
+			"encryption_key_for_snyk_token": cr.Spec.SnykSecrets.TokenEncryptionKey,
+			"iss":                           cr.Spec.SnykSecrets.Iss,
+			"token":                         cr.Spec.SnykSecrets.Token,
+		},
+	}
+	return secret
+}
+func (r *CodeReadyAnalyticsReconciler) graphSyncSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "developer-analytics-audit-report-s3",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: "Opaque",
+		StringData: map[string]string{
+			"bucket": cr.Spec.Gremlin.DeveloperAnalyticsAuditReportS3,
+		},
+	}
+	return secret
+}
+
+func (r *CodeReadyAnalyticsReconciler) npmSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "cvae-npm-insights-s3",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: "Opaque",
+		StringData: map[string]string{
+			"bucket":                cr.Spec.Config.NpmInsights.Bucket,
+			"aws_access_key_id":     os.Getenv("AWS_KEY"),
+			"aws_secret_access_key": os.Getenv("AWS_SECRET"),
+		},
+	}
+	return secret
+}
 
 func (r *CodeReadyAnalyticsReconciler) workerSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
 	labels := map[string]string{
@@ -190,13 +270,13 @@ func (r *CodeReadyAnalyticsReconciler) awsSecret(cr *f8av1alpha1.CodeReadyAnalyt
 		},
 		Type: corev1.SecretTypeOpaque,
 		Data: map[string][]byte{
-			"aws_access_key_id":      []byte(os.Getenv("AWS_KEY")),
-			"s3-access-key-id":       []byte(os.Getenv("AWS_KEY")),
-			"aws_secret_access_key":  []byte(os.Getenv("AWS_SECRET")),
-			"s3-secret-access-key":   []byte(os.Getenv("AWS_SECRET")),
-			"sync-s3":                []byte("1"),
-			"aws_region":             []byte(cr.Spec.Config.Common.AwsDefaultRegion),
-			"s3-bucket-for-analyses": []byte("deepshar-hello"),
+			"aws_access_key_id":     []byte(os.Getenv("AWS_KEY")),
+			"s3-access-key-id":      []byte(os.Getenv("AWS_KEY")),
+			"aws_secret_access_key": []byte(os.Getenv("AWS_SECRET")),
+			"s3-secret-access-key":  []byte(os.Getenv("AWS_SECRET")),
+			"sync-s3":               []byte("1"),
+			"aws_region":            []byte(cr.Spec.Config.Common.AwsDefaultRegion),
+			"sqs-access-key-id":     []byte(os.Getenv("AWS_KEY")),
 		},
 	}
 	return secret
@@ -252,11 +332,13 @@ func (r *CodeReadyAnalyticsReconciler) bayesianConfigMap(instance *f8av1alpha1.C
 			Labels:    labels,
 		},
 		Data: map[string]string{
-			"dynamodb-prefix":        instance.Spec.Config.Common.DynamodbPrefix,
-			"auth-url":               instance.Spec.Config.Common.AuthUrl,
-			"deployment-prefix":      instance.Spec.Config.Common.DeploymentPrefix,
-			"notification-url":       "",
-			"s3-bucket-for-analyses": "deepshar-bayesian-core-package-data",
+			"dynamodb-prefix":                instance.Spec.Config.Common.DynamodbPrefix,
+			"auth-url":                       instance.Spec.Config.Common.AuthUrl,
+			"deployment-prefix":              instance.Spec.Config.Common.DeploymentPrefix,
+			"notification-url":               "",
+			"s3-bucket-for-analyses":         instance.Spec.Config.Common.S3BucketForAnalyses,
+			"s3-bucket-for-package-analyses": instance.Spec.Config.Common.S3BucketForPackageAnalyses,
+			"aws-default-region":             instance.Spec.Config.Common.AwsDefaultRegion,
 		},
 	}
 }
