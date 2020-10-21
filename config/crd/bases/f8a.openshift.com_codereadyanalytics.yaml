@@ -105,10 +105,30 @@ spec:
                     username:
                       type: string
                   type: object
+                mavenInsights:
+                  description: InsightsType defines Configuration Specs
+                  properties:
+                    bucket:
+                      type: string
+                  type: object
+                npmInsights:
+                  description: InsightsType defines Configuration Specs
+                  properties:
+                    bucket:
+                      type: string
+                  type: object
+                pypiInsights:
+                  description: InsightsType defines Configuration Specs
+                  properties:
+                    bucket:
+                      type: string
+                  type: object
               type: object
             gremlin:
               description: GremlinType defines Specs for Gremlin Service
               properties:
+                developerAnalyticsAuditReportS3:
+                  type: string
                 dynamoDbEndpoint:
                   type: string
                 image:
@@ -149,6 +169,16 @@ spec:
                 size:
                   format: int32
                   type: integer
+              type: object
+            snykSecrets:
+              description: snykSecretsType defines Snyk Secrets Types
+              properties:
+                iss:
+                  type: string
+                token:
+                  type: string
+                tokenEncryptionKey:
+                  type: string
               type: object
             worker:
               description: WorkerType defines Worker Types
@@ -216,6 +246,8 @@ spec:
             gremlin:
               description: GremlinType defines Specs for Gremlin Service
               properties:
+                developerAnalyticsAuditReportS3:
+                  type: string
                 dynamoDbEndpoint:
                   type: string
                 image:

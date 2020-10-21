@@ -50,7 +50,7 @@ type GremlinType struct {
 	Image                           string       `json:"image,omitempty"`
 	DynamoDbEndpoint                string       `json:"dynamoDbEndpoint,omitempty"`
 	Resources                       ResourceType `json:"resources,omitempty"`
-	DeveloperAnalyticsAuditReportS3 string       `json:"resources,omitempty"`
+	DeveloperAnalyticsAuditReportS3 string       `json:"developerAnalyticsAuditReportS3,omitempty"`
 }
 
 // DatabaseType defines Database Config Specs
