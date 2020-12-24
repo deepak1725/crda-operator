@@ -171,7 +171,7 @@ spec:
                   type: integer
               type: object
             snykSecrets:
-              description: snykSecretsType defines Snyk Secrets Types
+              description: snykSecretsType defines Worker Types
               properties:
                 iss:
                   type: string

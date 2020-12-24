@@ -96,7 +96,7 @@ spec:
         - name: DISABLE_UNKNOWN_PACKAGE_FLOW
           value: "0"
 
-        image: "sharma1725/backbone:latest"
+        image: "quay.io/deepshar/backbone:latest"
         name: f8a-server-backbone
         ports:
         - containerPort: 5000

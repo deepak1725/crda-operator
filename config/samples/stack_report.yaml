@@ -1,0 +1,199 @@
+apiVersion:  batch/v1beta1
+kind: CronJob
+metadata:
+    name: f8a-stack-report-daily
+    annotations:
+      description: f8a-stack-report-daily
+spec:
+    successfulJobsHistoryLimit: 4
+    failedJobsHistoryLimit: 1
+    concurrencyPolicy: "Forbid"
+    schedule: "5 5 * * *"
+    jobTemplate:
+        spec:
+            template:
+                spec:
+                    restartPolicy: Never
+                    containers:
+                    -   name: f8a-stacks-report
+                        image: "sharma1725/sreport:latest"
+                        args: ["f8a_report/stack_report_main.py"]
+                        imagePullPolicy: Always
+                        env:
+                        -   name: BAYESIAN_GREMLIN_HTTP_SERVICE_HOST
+                            value: bayesian-gremlin-http
+                        -   name: BAYESIAN_GREMLIN_HTTP_SERVICE_PORT
+                            value: "8182"
+                        -   name: GITHUB_CVE_REPO
+                            value: fabric8-analytics
+                        -   name: KEEP_DB_META_NUM_DAYS
+                            value: "7"
+                        -   name: KEEP_WORKER_RESULT_NUM_DAYS
+                            value: "60"
+                        -   name: GENERATE_MANIFESTS
+                            value: "False"
+                        -   name: SENTRY_API_ISSUES
+                            value: "/api/0/projects/sentry/fabric8-analytics-production/issues/"
+                        -   name: SENTRY_API_TAGS
+                            value: "/api/0/issues/"
+                        -   name: GOLANG_TRAINING_REPO
+                            value: "https://github.com/fabric8-analytics/f8a-golang-insights"
+                        -   name: MAVEN_TRAINING_REPO
+                            value: "https://github.com/fabric8-analytics/f8a-hpf-insights"
+                        -   name: NPM_TRAINING_REPO
+                            value: https://github.com/fabric8-analytics/fabric8-analytics-npm-insights
+                        -   name: PYPI_TRAINING_REPO
+                            value: https://github.com/fabric8-analytics/f8a-pypi-insights
+                        -   name: GREMLIN_QUERY_SIZE
+                            value: "25"
+                        -   name: PGBOUNCER_SERVICE_HOST
+                            value: bayesian-pgbouncer
+                        -   name: SNYK_API_TOKEN_VALIDATION_URL
+                            valueFrom:
+                                configMapKeyRef:
+                                    name: bayesian-config
+                                    key: snyk_api_token_validation_url
+                        -   name: DEPLOYMENT_PREFIX
+                            valueFrom:
+                                configMapKeyRef:
+                                    name: bayesian-config
+                                    key: deployment-prefix
+                        -   name: AWS_S3_REGION
+                            valueFrom:
+                                configMapKeyRef:
+                                    name: bayesian-config
+                                    key: aws-default-region
+                        -   name: AWS_S3_SECRET_ACCESS_KEY
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: s3-secret-access-key
+                        -   name: AWS_S3_ACCESS_KEY_ID
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: s3-access-key-id
+                        -   name: AWS_S3_SECRET_ACCESS_KEY_REPORT_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_secret_access_key
+                        -   name: AWS_S3_ACCESS_KEY_ID_REPORT_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_access_key_id
+                        -   name: AWS_S3_SECRET_ACCESS_KEY_NPM_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_secret_access_key
+                        -   name: AWS_S3_ACCESS_KEY_ID_NPM_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_access_key_id
+                        -   name: AWS_S3_SECRET_ACCESS_KEY_MVN_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_secret_access_key
+                        -   name: AWS_S3_ACCESS_KEY_ID_MVN_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_access_key_id
+                        -   name: AWS_S3_SECRET_ACCESS_KEY_PYPI_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_secret_access_key
+                        -   name: AWS_S3_ACCESS_KEY_ID_PYPI_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_access_key_id
+                        -   name: AWS_S3_SECRET_ACCESS_KEY_GOLANG_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_secret_access_key
+                        -   name: AWS_S3_ACCESS_KEY_ID_GOLANG_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: aws
+                                    key: aws_access_key_id
+                        -   name: POSTGRESQL_DATABASE
+                            valueFrom:
+                                secretKeyRef:
+                                    key: database
+                                    name: coreapi-postgres
+                        -   name: POSTGRESQL_PASSWORD
+                            valueFrom:
+                                secretKeyRef:
+                                    key: password
+                                    name: coreapi-postgres
+                        -   name: POSTGRESQL_USER
+                            valueFrom:
+                                secretKeyRef:
+                                    key: username
+                                    name: coreapi-postgres
+                        -   name: SENTRY_AUTH_TOKEN
+                            valueFrom:
+                                secretKeyRef:
+                                    name: worker
+                                    key: sentry-auth-token
+                        -   name: SENTRY_URL
+                            valueFrom:
+                                secretKeyRef:
+                                    name: worker
+                                    key: sentry-url
+                        -   name: REPORT_BUCKET_NAME
+                            valueFrom:
+                                secretKeyRef:
+                                    name: developer-analytics-audit-report-s3
+                                    key: bucket
+                        -   name: NPM_MODEL_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: cvae-npm-insights-s3
+                                    key: bucket
+                        -   name: MAVEN_MODEL_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: hpf-maven-insights-s3
+                                    key: bucket
+                        -   name: PYPI_MODEL_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: hpf-pypi-insights-s3
+                                    key: bucket
+                        -   name: GOLANG_MODEL_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: golang-insights-s3
+                                    key: bucket
+                        -   name: ENCRYPTION_KEY_FOR_SNYK_TOKEN
+                            valueFrom:
+                                secretKeyRef:
+                                    name: snyk-secrets
+                                    key: encryption_key_for_snyk_token
+                        -   name: MANIFESTS_BUCKET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: dynamic-manifests
+                                    key: bucket
+                        -   name: APP_SECRET_KEY
+                            valueFrom:
+                                secretKeyRef:
+                                    name: jobs
+                                    key: flask-app-secret-key
+                        resources:
+                            requests:
+                                memory: 1024Mi
+                                cpu: 250m
+                            limits:
+                                memory: "2048Mi"
+                                cpu: "500m"
+
+

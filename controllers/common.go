@@ -282,6 +282,85 @@ func (r *CodeReadyAnalyticsReconciler) awsSecret(cr *f8av1alpha1.CodeReadyAnalyt
 	return secret
 }
 
+func (r *CodeReadyAnalyticsReconciler) hpfmavenSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+	// Stack Report
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "hpf-maven-insights-s3",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: corev1.SecretTypeOpaque,
+		Data: map[string][]byte{
+			"bucket": []byte("1"),
+		},
+	}
+	return secret
+}
+
+func (r *CodeReadyAnalyticsReconciler) golangSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+	// Stack Report
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "golang-insights-s3",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: corev1.SecretTypeOpaque,
+		Data: map[string][]byte{
+			"bucket": []byte("1"),
+		},
+	}
+	return secret
+}
+
+func (r *CodeReadyAnalyticsReconciler) hpfpypiSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+	// Stack Report
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "dynamic-manifests",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: corev1.SecretTypeOpaque,
+		Data: map[string][]byte{
+			"bucket": []byte("1"),
+		},
+	}
+	return secret
+}
+func (r *CodeReadyAnalyticsReconciler) jobsSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
+	labels := map[string]string{
+		"app": cr.Name,
+	}
+	// Stack Report
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "jobs",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Type: corev1.SecretTypeOpaque,
+		Data: map[string][]byte{
+			"flask-app-secret-key": []byte("1"),
+		},
+	}
+	return secret
+}
+
 func (r *CodeReadyAnalyticsReconciler) threeScaleSecret(cr *f8av1alpha1.CodeReadyAnalytics) *corev1.Secret {
 	labels := map[string]string{
 		"app": cr.Name,

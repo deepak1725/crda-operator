@@ -99,6 +99,27 @@ func (r *CodeReadyAnalyticsReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 	if result != nil {
 		return *result, err
 	}
+	// AWS Secret
+	result, err = r.ensureSecret(req, instance, r.hpfmavenSecret(instance))
+	if result != nil {
+		return *result, err
+	}
+	// AWS Secret
+	result, err = r.ensureSecret(req, instance, r.golangSecret(instance))
+	if result != nil {
+		return *result, err
+	}
+	// AWS Secret
+	result, err = r.ensureSecret(req, instance, r.hpfpypiSecret(instance))
+	if result != nil {
+		return *result, err
+	}
+	// AWS Secret
+	result, err = r.ensureSecret(req, instance, r.jobsSecret(instance))
+	if result != nil {
+		return *result, err
+	}
+
 	// Snyk Secret
 	result, err = r.ensureSecret(req, instance, r.snykSecret(instance))
 	if result != nil {

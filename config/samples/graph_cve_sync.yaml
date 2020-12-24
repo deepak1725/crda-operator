@@ -16,7 +16,7 @@ spec:
             restartPolicy: Never
             containers:
             - name: f8a-graph-cve-sync
-              image: "yusufzainee/graph21"
+              image: "quay.io/openshiftio/fabric8-analytics-graph-cve-sync"
               env:
                 - name: SYNC_MODE
                   value: "diff"

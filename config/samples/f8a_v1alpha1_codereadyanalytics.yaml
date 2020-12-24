@@ -56,13 +56,13 @@ spec:
         cpu: "250m"
         memory: "500Mi"
   api-server: 
-    image: sharma1725/aserver
+    image: quay.io/deepshar/aserver
     size: 1
     containerPort: 5000
     name: api-server
     port: 32000
   backbone:
-    image: sharma1725/backbone
+    image: quay.io/deepshar/backbone
     size: 1
     containerPort: 5000
     name: backbone
